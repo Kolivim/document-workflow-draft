@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: document-workflow
+  profiles:
+    default: dev
+  datasource:
+#    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/doc_workflow
+    username: docWf
+    password: docWf
+
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+#    show-sql:true
+
+  liquibase:
+    default-schema: doc_workflow
+#    change-log: E:\work\test\2026\02\ITQ\document-worlflow\document-worlflow\src\main\resources\db\migration\database-doc.workflow-changelog-master.yaml
+    change-log: classpath:/db/migration/database-doc.workflow-changelog-master.yaml
+number: 8
+batchSize: 10

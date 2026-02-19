@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - include:
+      file: db/migration/changelog/v1.0/v.0.1_01_initial-schema.yaml
+  - include:
+      file: db/migration/changelog/v1.0/v.0.1_03_create-table-register.yaml
+  - include:
+      file: db/migration/changelog/v1.0/v.0.1_04_create-table-history.yaml
+  - include:
+      file: db/migration/changelog/v1.0/v.0.1_02_create-table-documents.yaml
+
+#  - include:
+#      file: db/changelog/changesets/alter-table-history-add-fk.yaml
