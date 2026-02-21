@@ -4,8 +4,7 @@ import ch.qos.logback.core.status.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-@Setter
-@Getter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

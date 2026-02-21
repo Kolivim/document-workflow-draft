@@ -22,16 +22,20 @@ public class CreateScheduler {
     }
 
     @PostConstruct
-    public void init() {
-    }
+    public void init() {}
 
     @Scheduled(cron = "0 * * * * *")
     //@Transactional
     protected void create() {
 
-        for (int i = 0; i <= number; i++){
+        log.info("startMethod, получено количество документов для создания = {}", number);
+
+        for (int i = 0; i < number; i++){
             Document document = documentService.create();
-            log.info("Создан документ с id {}", document.getId().toString());
+            log.info("Создан документ с id: {}, итого обработано {} документов, из общего количества документов к созданию = {}",
+                    document.getId().toString(), i + 1, number);
         }
+
     }
+
 }

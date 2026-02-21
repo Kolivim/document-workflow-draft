@@ -46,10 +46,21 @@ public class SpecificationUtils {
     }
 
 
+    /** Хранящееся в переданном поле значение даты попадает в переданный диапазон дат */
     public static <T, K> Specification <T> betweenDate(String key, ZonedDateTime dateTimeFrom, ZonedDateTime dateTimeTo){
         Specification<T> spec = ((root, query, criteriaBuilder) -> dateTimeFrom == null || dateTimeTo == null
                 ? null : criteriaBuilder.between(root.get(key), dateTimeFrom, dateTimeTo));
         return spec;
     }
+
+
+    /** Прямое сравнение: дата равна (EQUAL) */
+    public static <T> Specification<T> equalDate(String field, ZonedDateTime dateTime) {
+        return (root, query, criteriaBuilder) -> {
+            if (dateTime == null) return criteriaBuilder.conjunction();
+            return criteriaBuilder.equal(root.get(field), dateTime);
+        };
+    }
+
 
 }

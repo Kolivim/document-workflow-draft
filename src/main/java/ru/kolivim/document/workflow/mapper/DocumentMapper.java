@@ -1,5 +1,6 @@
 package ru.kolivim.document.workflow.mapper;
 
+import org.mapstruct.*;
 import ru.kolivim.document.workflow.dto.DocumentDto;
 import ru.kolivim.document.workflow.dto.HistoryDto;
 import ru.kolivim.document.workflow.dto.RegisterDto;
@@ -8,22 +9,25 @@ import ru.kolivim.document.workflow.entity.History;
 import ru.kolivim.document.workflow.entity.Register;
 import ru.kolivim.document.workflow.entity.enums.Action;
 import ru.kolivim.document.workflow.entity.enums.Status;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Mapper
+@Mapper(componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface DocumentMapper {
+
     @Mapping(target = "historySet", source = "historySet", qualifiedByName = "toEntityHistorySet")
     @Mapping(target = "register", source = "register", qualifiedByName = "toEntityRegister")
     Document dtoToEntity(DocumentDto documentDto);
 
-    @Mapping(target = "historySet", source = "historySet", qualifiedByName = "toDtoHistorySet")
-    @Mapping(target = "register", source = "register", qualifiedByName = "toDtoRegister")
+    @Mappings({
+            @Mapping(target = "historySet", source = "historySet", qualifiedByName = "toDtoHistorySet"),
+            @Mapping(target = "register", source = "register", qualifiedByName = "toDtoRegister"),
+            @Mapping(target = "description", ignore = true),
+            @Mapping(target = "updateDate", ignore = true)
+    })
     DocumentDto entityToDto(Document document);
 
     List<Document> dtosToEntities(List<DocumentDto> documentDtos);
@@ -80,9 +84,9 @@ public interface DocumentMapper {
                         DocumentDto.builder()
                                 .id(register.getDocument().getId())
                                 .author(register.getDocument().getAuthor())
-                                .title(register.getDocument().getName())
-                                .createTime(register.getDocument().getCreateDate())
-//                                .updateTime(register.getDocument().getUpdateTime())
+                                .name(register.getDocument().getName())
+                                .createDate(register.getDocument().getCreateDate())
+                                .updateDate(register.getDocument().getUpdateDate())
                                 .innerId(register.getDocument().getInnerId())
                                 .status(Status.APPROVED)
                                 .build())

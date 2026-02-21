@@ -1,6 +1,7 @@
 package ru.kolivim.document.workflow.service;
 
 import ru.kolivim.document.workflow.dto.DocumentDto;
+import ru.kolivim.document.workflow.dto.SearchDocumentDto;
 import ru.kolivim.document.workflow.dto.SubmitDocumentDto;
 import ru.kolivim.document.workflow.entity.Document;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,16 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DocumentService {
+
+    Page<DocumentDto> getByFilter(SearchDocumentDto searchDocumentDto, Pageable pageable);
+
+    Page<DocumentDto> getByAdvancedFilter(SearchDocumentDto searchDocumentDto, Pageable pageable);
+
+
+
+    /** Устаревшие реализации далее */
+    /******************************************************************************************************************/
+
 
     Document create();
 
@@ -25,8 +36,9 @@ public interface DocumentService {
 
     List<SubmitDocumentDto> submit(List<Long> ids);
 
-    List<Document> findByStatusAuthorDate(Status status, Optional<String> author, Optional<ZonedDateTime> startDate,
-                                          Optional<ZonedDateTime> endDate);
+    @Deprecated
+    List<Document> findByStatusAuthorDate(Status status, Optional<String> author,
+                                          Optional<ZonedDateTime> startDate, Optional<ZonedDateTime> endDate);
 
     Document update(Document document);
 

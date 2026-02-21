@@ -7,13 +7,13 @@ import lombok.*;
 
 import java.time.ZonedDateTime;
 
-@Setter
-@Getter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "История изменения документа", type = "object")
 public class HistoryDto {
+
     @Schema(description = "id")
     @NotEmpty
     private Long id;
@@ -32,4 +32,5 @@ public class HistoryDto {
 
     @Schema(description = "document")
     private DocumentDto document;
+
 }

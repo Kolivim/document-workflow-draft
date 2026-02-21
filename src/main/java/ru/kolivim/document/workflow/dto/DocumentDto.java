@@ -1,6 +1,7 @@
 package ru.kolivim.document.workflow.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.experimental.SuperBuilder;
 import ru.kolivim.document.workflow.entity.enums.Status;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
@@ -8,9 +9,8 @@ import lombok.*;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
-@Setter
-@Getter
-@Builder
+@Data
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Документ", type = "object")
@@ -28,25 +28,29 @@ public class DocumentDto {
     @NotEmpty
     private String author;
 
-    @Schema(description = "title")
+    @Schema(description = "name")
     @NotEmpty
-    private String title;
+    private String name;
+
+    @Schema(description = "description")
+    private String description;
 
     @Schema(description = "status")
     @NotEmpty
     private Status status;
 
-    @Schema(description = "create_time")
+    @Schema(description = "create_date")
     @NotEmpty
-    private ZonedDateTime createTime;
+    private ZonedDateTime createDate;
 
-    @Schema(description = "update_time")
-    @NotEmpty
-    private ZonedDateTime updateTime;
+    @Schema(description = "update_date")
+    private ZonedDateTime updateDate;
+
 
     @Schema(description = "historySet")
     private Set<HistoryDto> historySet;
 
     @Schema(description = "register")
     private RegisterDto register;
+
 }

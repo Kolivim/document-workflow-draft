@@ -17,6 +17,7 @@ import java.util.stream.IntStream;
 @Slf4j
 @Component
 public class WorkerScheduler {
+
     private final RegisterService registerService;
 
     private final DocumentService documentService;
@@ -24,14 +25,16 @@ public class WorkerScheduler {
     @Value("${batchSize}")
     Integer batchSize;
 
+
     public WorkerScheduler(RegisterService registerService, DocumentService documentService) {
         this.registerService = registerService;
         this.documentService = documentService;
     }
 
+
     @PostConstruct
-    public void init() {
-    }
+    public void init() {}
+
 
     @Scheduled(cron = "0 */2 * * * *")
     protected void approve() {
@@ -39,11 +42,13 @@ public class WorkerScheduler {
         workWithBatchSize(documents, batchSize, Status.SUBMITTED);
     }
 
+
     @Scheduled(cron = "0 */2 * * * *")
     protected void submit() {
         List<Document> documents = documentService.findByStatusAuthorDate(Status.DRAFT, Optional.empty(), Optional.empty(), Optional.empty());
         workWithBatchSize(documents, batchSize, Status.DRAFT);
     }
+
 
     private void workWithBatchSize(List<Document> documents,
                                   Integer batchSize,
@@ -63,6 +68,8 @@ public class WorkerScheduler {
             checkStatus(status, ids);
         }
     }
+
+
     private void checkStatus(Status status, List<Long> list){
         if (status == Status.DRAFT){
             documentService.submit(list);
@@ -74,4 +81,5 @@ public class WorkerScheduler {
             log.info("ids {}", Arrays.toString(list.toArray()));
         }
     }
+
 }

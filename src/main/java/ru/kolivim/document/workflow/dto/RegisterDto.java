@@ -5,13 +5,13 @@ import ru.kolivim.document.workflow.entity.enums.Status;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
-@Setter
-@Getter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Переводы документов в статус ЗАРЕГИСТРИРОВАН", type = "object")
 public class RegisterDto {
+
     @Schema(description = "id")
     @NotEmpty
     private Long id;
@@ -21,4 +21,5 @@ public class RegisterDto {
 
     @Schema(description = "document")
     private DocumentDto document;
+
 }

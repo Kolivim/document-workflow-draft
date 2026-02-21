@@ -1,8 +1,12 @@
 package ru.kolivim.document.workflow.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import ru.kolivim.document.workflow.dto.DocumentDto;
+import ru.kolivim.document.workflow.dto.SearchDocumentDto;
 import ru.kolivim.document.workflow.dto.SubmitDocumentDto;
 import ru.kolivim.document.workflow.entity.Document;
+import ru.kolivim.document.workflow.entity.Document_;
 import ru.kolivim.document.workflow.entity.History;
 import ru.kolivim.document.workflow.entity.enums.Action;
 import ru.kolivim.document.workflow.entity.enums.OperationStatus;
@@ -17,10 +21,13 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kolivim.document.workflow.utils.specification.SpecificationUtils;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
@@ -31,15 +38,99 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final DocumentMapper documentMapper;
 
+
+
+
+    /**
+     @return Page со списком документов , удовлетворяющих полученным в параметрах условиям,
+            таким как : статус, автор, период дат создания
+     */
+    @Override
+    public Page<DocumentDto> getByFilter(SearchDocumentDto searchDocumentDto, Pageable pageable) {
+        log.info("startMethod, к поиску получен searchDocumentDto: {}", searchDocumentDto);
+
+        Specification documentSpecification = SpecificationUtils.in(Document_.STATUS, searchDocumentDto.getStatus())
+                .and(SpecificationUtils.like(Document_.AUTHOR, searchDocumentDto.getAuthor()))
+                .and(SpecificationUtils.betweenDate(
+                                Document_.CREATE_DATE,
+                                getSearchStartDate(searchDocumentDto.getStartDate()),
+                                getSearchEndDate(searchDocumentDto.getEndDate())));
+
+
+        /*
+        Specification documentSpecification = SpecificationUtils.in(Document_.STATUS, searchDocumentDto.getStatus())
+                .and(SpecificationUtils.like(Document_.AUTHOR, searchDocumentDto.getAuthor())
+                        .and(SpecificationUtils.betweenDate(
+                                Document_.CREATE_DATE,
+                                getSearchStartDate(searchDocumentDto.getStartDate()),
+                                getSearchEndDate(searchDocumentDto.getEndDate())))
+                );
+        */
+
+
+        Page<Document> documents = documentRepository.findAll(documentSpecification, pageable);
+        Page<DocumentDto> documentsDto = documents.map(documentMapper::entityToDto);
+
+        log.info("endMethod, к возврату Page<DocumentDto>: {}", documentsDto);
+        return documentsDto;
+    }
+
+
+    /**
+     @return Page со списком документов , удовлетворяющих полученным в параметрах условиям,
+     таким как : статус, автор, период дат создания, название документа, дата обновления, внутренний id
+     */
+    @Override
+    public Page<DocumentDto> getByAdvancedFilter(SearchDocumentDto searchDocumentDto, Pageable pageable) {
+        log.info("startMethod, к поиску получен searchDocumentDto: {}", searchDocumentDto);
+
+        Specification documentSpecification = SpecificationUtils.in(Document_.STATUS, searchDocumentDto.getStatus())
+                .and(SpecificationUtils.like(Document_.AUTHOR, searchDocumentDto.getAuthor()))
+                .and(SpecificationUtils.betweenDate(
+                        Document_.CREATE_DATE,
+                        getSearchStartDate(searchDocumentDto.getStartDate()),
+                        getSearchEndDate(searchDocumentDto.getEndDate())))
+                .and(SpecificationUtils.like(Document_.NAME, searchDocumentDto.getName()))
+                .and(SpecificationUtils.equalDate(Document_.UPDATE_DATE, searchDocumentDto.getUpdateDate()))
+                .and(SpecificationUtils.like(Document_.INNER_ID, searchDocumentDto.getInnerId()));
+
+
+        Page<Document> documents = documentRepository.findAll(documentSpecification, pageable);
+        Page<DocumentDto> documentsDto = documents.map(documentMapper::entityToDto);
+
+        log.info("endMethod, к возврату Page<DocumentDto>: {}", documentsDto);
+        return documentsDto;
+    }
+
+
+    private ZonedDateTime getSearchStartDate(ZonedDateTime dateTime) {
+        log.info("startMethod, : {}", dateTime);
+        return dateTime != null ? dateTime
+                : ZonedDateTime.of(1900, 01, 01, 01, 01, 01, 1000,
+                ZoneId.of("Europe/Moscow"));
+    }
+
+    private ZonedDateTime getSearchEndDate(ZonedDateTime dateTime) {
+        log.info("startMethod, : {}", dateTime);
+        return dateTime != null ? dateTime : ZonedDateTime.now();
+    }
+
+
+    /** Устаревшие реализации далее */
+    /******************************************************************************************************************/
+
+
     @Override
     @Transactional
     public Document create() {
+
         Document document = Document.builder()
                 .author(generateAuthor())
                 .createDate(ZonedDateTime.now())
                 .innerId(String.valueOf(Math.random()))
                 .status(Status.DRAFT)
                 .name(generateTitle()).build();
+
         return documentRepository.save(document);
     }
 
@@ -79,10 +170,12 @@ public class DocumentServiceImpl implements DocumentService {
         return resultPage;
     }
 
+
     @Override
     public List<DocumentDto> entitiesToDtos(List<Document> documents) {
         return documentMapper.entitiesToDtos(documents);
     }
+
 
     @Override
     @Transactional
@@ -108,10 +201,12 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
 
+    @Deprecated
     @Override
     public List<Document> findByStatusAuthorDate(Status status, Optional<String> author, Optional<ZonedDateTime> startDate, Optional<ZonedDateTime> endDate) {
 
         List<Document> documents = new ArrayList<>(documentRepository.findByStatus(status));
+
         author.ifPresent(s -> documents.retainAll(documentRepository.findByAuthor(s)));
         startDate.ifPresent(zonedDateTime -> documents.retainAll(documentRepository.findByCreateDateAfter(zonedDateTime)));
         endDate.ifPresent(zonedDateTime -> documents.retainAll(documentRepository.findByCreateDateBefore(zonedDateTime)));
