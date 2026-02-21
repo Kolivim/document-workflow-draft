@@ -1,5 +1,7 @@
 package ru.kolivim.document.workflow.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.hibernate.annotations.GenericGenerator;
 import ru.kolivim.document.workflow.entity.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,6 +10,14 @@ import org.hibernate.annotations.Cascade;
 
 import java.time.ZonedDateTime;
 import java.util.Set;
+import java.util.UUID;
+
+
+/**
+ * DocumentEntity
+ *
+ * @author Kolivim
+ */
 
 @Entity
 @NamedQuery(name = "selectDocument", query = "SELECT e FROM Document e",
@@ -21,7 +31,7 @@ import java.util.Set;
 public class Document {
 
     @Id
-    @Column(name = "document_id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -31,18 +41,21 @@ public class Document {
     @Column(name = "author")
     private String author;
 
-    @Column(name = "title")
-    private String title;
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Column(name = "create_time")
-    private ZonedDateTime createTime;
+    @Schema(description = "Дата создания документа")
+    @Column(name = "create_date")
+    private ZonedDateTime createDate;
 
-    @Column(name = "update_time")
-    private ZonedDateTime updateTime;
+    @Schema(description = "Дата обновления статуса документа")
+    @Column(name = "update_date")
+    private ZonedDateTime updateDate;
+
 
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "document", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -52,6 +65,17 @@ public class Document {
     private Set<History> historySet;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "register_id", referencedColumnName = "id")
+    @JoinColumn(name = "id", referencedColumnName = "id")
     private Register register;
+
+
+    /*
+    @PrePersist
+    public void generateInnerId() {
+        if (innerId == null) {
+            innerId = UUID.randomUUID().toString();
+        }
+    }
+    */
+
 }

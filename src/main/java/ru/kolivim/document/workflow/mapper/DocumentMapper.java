@@ -1,4 +1,4 @@
-package ru.kolivim.document.workflow.mappers;
+package ru.kolivim.document.workflow.mapper;
 
 import ru.kolivim.document.workflow.dto.DocumentDto;
 import ru.kolivim.document.workflow.dto.HistoryDto;
@@ -37,7 +37,7 @@ public interface DocumentMapper {
         for (HistoryDto historyDto : new HashSet<>(historyDtoSet)) {
             historySet.add(History.builder()
                     .action(historyDto.getAction())
-                    .time(historyDto.getTime())
+                    .date(historyDto.getTime())
                     .author(historyDto.getAuthor())
                     .id(historyDto.getId())
                     .comment(historyDto.getComment()).build());
@@ -49,7 +49,7 @@ public interface DocumentMapper {
     default Register toEntityRegister(RegisterDto registerDto){
         return Register.builder()
                 .id(registerDto == null? 0: registerDto.getId())
-                .status(registerDto == null? Status.DRAFT: registerDto.getStatus())
+//                .status(registerDto == null? Status.DRAFT: registerDto.getStatus())
                 .build();
     }
 
@@ -62,7 +62,7 @@ public interface DocumentMapper {
         for (History history : new HashSet<>(historySet)) {
             historyDtoSet.add(HistoryDto.builder()
                     .action(history == null? Action.SUBMIT: history.getAction())
-                    .time(history == null? null: history.getTime())
+                    .time(history == null? null: history.getDate())
                     .author(history == null? "": history.getAuthor())
                     .id(history == null? 0: history.getId())
                     .comment(history == null? "": history.getComment()).build());
@@ -72,18 +72,19 @@ public interface DocumentMapper {
 
     @Named("toDtoRegister")
     default RegisterDto toDtoRegister(Register register){
+
         return RegisterDto.builder()
-                .id(register == null? 0: register.getId())
-                .status(register == null? Status.DRAFT: register.getStatus())
+                .id(register == null ? 0: register.getId())
+//                .status(register == null? Status.DRAFT: register.getStatus())
                 .document(register == null ? null:
                         DocumentDto.builder()
                                 .id(register.getDocument().getId())
                                 .author(register.getDocument().getAuthor())
-                                .title(register.getDocument().getTitle())
-                                .createTime(register.getDocument().getCreateTime())
-                                .updateTime(register.getDocument().getUpdateTime())
+                                .title(register.getDocument().getName())
+                                .createTime(register.getDocument().getCreateDate())
+//                                .updateTime(register.getDocument().getUpdateTime())
                                 .innerId(register.getDocument().getInnerId())
-                                .status(register.getStatus())
+                                .status(Status.APPROVED)
                                 .build())
                 .build();
     }

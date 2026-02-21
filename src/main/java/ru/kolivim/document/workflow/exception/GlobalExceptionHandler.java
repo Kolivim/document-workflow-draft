@@ -1,4 +1,4 @@
-package ru.kolivim.document.workflow.controller;
+package ru.kolivim.document.workflow.exception;
 import ru.kolivim.document.workflow.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package ru.kolivim.document.workflow.mappers;
+package ru.kolivim.document.workflow.mapper;
 
 import ru.kolivim.document.workflow.dto.HistoryDto;
 import ru.kolivim.document.workflow.entity.History;

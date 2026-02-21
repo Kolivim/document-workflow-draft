@@ -23,8 +23,8 @@ public class History {
     @Column(name = "author")
     private String author;
 
-    @Column(name = "time")
-    private ZonedDateTime time;
+    @Column(name = "date")
+    private ZonedDateTime date;
 
     @Column(name = "action")
     @Enumerated(EnumType.STRING)
@@ -35,6 +35,7 @@ public class History {
 
     @ManyToOne
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-    @JoinColumn(name = "document_id", referencedColumnName = "document_id")
+    @JoinColumn(name = "document_id", referencedColumnName = "id")
     private Document document;
+
 }

@@ -8,17 +8,23 @@ spring:
     url: jdbc:postgresql://localhost:5432/doc_workflow
     username: docWf
     password: docWf
+#    hikari:
+#      connection-init-sql: CREATE SCHEMA IF NOT EXISTS doc_workflow
 
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
+
 #    show-sql:true
 
   liquibase:
-    default-schema: doc_workflow
-#    change-log: E:\work\test\2026\02\ITQ\document-worlflow\document-worlflow\src\main\resources\db\migration\database-doc.workflow-changelog-master.yaml
-    change-log: classpath:/db/migration/database-doc.workflow-changelog-master.yaml
+    default-schema: public
+    liquibase-schema: public
+#    default-schema: doc_workflow
+    change-log: classpath:/db/migration/database-doc.workflow-changelog-master.xml
+#    change-log: classpath:/db/migration/database-doc.workflow-changelog-master.yaml
+
 number: 8
 batchSize: 10

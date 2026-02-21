@@ -8,7 +8,7 @@ import ru.kolivim.document.workflow.entity.enums.Action;
 import ru.kolivim.document.workflow.entity.enums.OperationStatus;
 import ru.kolivim.document.workflow.entity.enums.Status;
 import ru.kolivim.document.workflow.exception.ResourceNotFoundException;
-import ru.kolivim.document.workflow.mappers.DocumentMapper;
+import ru.kolivim.document.workflow.mapper.DocumentMapper;
 import ru.kolivim.document.workflow.repository.DocumentRepository;
 import ru.kolivim.document.workflow.repository.HistoryRepository;
 import ru.kolivim.document.workflow.service.DocumentService;
@@ -36,10 +36,10 @@ public class DocumentServiceImpl implements DocumentService {
     public Document create() {
         Document document = Document.builder()
                 .author(generateAuthor())
-                .createTime(ZonedDateTime.now())
+                .createDate(ZonedDateTime.now())
                 .innerId(String.valueOf(Math.random()))
                 .status(Status.DRAFT)
-                .title(generateTitle()).build();
+                .name(generateTitle()).build();
         return documentRepository.save(document);
     }
 
@@ -107,40 +107,52 @@ public class DocumentServiceImpl implements DocumentService {
         return submitDocumentDtoList;
     }
 
+
     @Override
     public List<Document> findByStatusAuthorDate(Status status, Optional<String> author, Optional<ZonedDateTime> startDate, Optional<ZonedDateTime> endDate) {
+
         List<Document> documents = new ArrayList<>(documentRepository.findByStatus(status));
         author.ifPresent(s -> documents.retainAll(documentRepository.findByAuthor(s)));
-        startDate.ifPresent(zonedDateTime -> documents.retainAll(documentRepository.findByCreateTimeAfter(zonedDateTime)));
-        endDate.ifPresent(zonedDateTime -> documents.retainAll(documentRepository.findByCreateTimeBefore(zonedDateTime)));
+        startDate.ifPresent(zonedDateTime -> documents.retainAll(documentRepository.findByCreateDateAfter(zonedDateTime)));
+        endDate.ifPresent(zonedDateTime -> documents.retainAll(documentRepository.findByCreateDateBefore(zonedDateTime)));
+
         return documents;
     }
 
     @Override
     @Transactional
     public Document update(Document document) {
+
         Document newDocument = documentRepository.findById(document.getId()).orElseThrow();
-        if (document.getCreateTime() != null) {
-            newDocument.setCreateTime(document.getCreateTime());
+
+        if (document.getCreateDate() != null) {
+            newDocument.setCreateDate(document.getCreateDate());
         }
+
         if (document.getAuthor() != null) {
             newDocument.setAuthor(document.getAuthor());
         }
+
         newDocument.setStatus(Status.SUBMITTED);
-        if (document.getTitle() != null) {
-            newDocument.setTitle(document.getTitle());
+        if (document.getName() != null) {
+            newDocument.setName(document.getName());
         }
+
         Set<History> historySet = generateHistorySubmit(document);
         //document.getHistorySet().clear();
+
         newDocument.getHistorySet().addAll(historySet);
         //historyRepository.saveAll(historySet);
 //        for (History history1 : historySet) {
 //            history1.setDocument(document);
 //        }
+
         if (document.getInnerId() != null) {
             newDocument.setInnerId(document.getInnerId());
         }
-        newDocument.setUpdateTime(ZonedDateTime.now());
+
+//        newDocument.setUpdateTime(ZonedDateTime.now());
+
         documentRepository.save(newDocument);
         return newDocument;
     }
@@ -164,7 +176,7 @@ public class DocumentServiceImpl implements DocumentService {
         Set<History> histories = new HashSet<>();
         History history = History.builder()
                 .action(Action.SUBMIT)
-                .time(ZonedDateTime.now())
+                .date(ZonedDateTime.now())
                 .author(document.getAuthor())
                 .document(document)
                 .build();

@@ -1,5 +1,6 @@
 package ru.kolivim.document.workflow.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.kolivim.document.workflow.dto.SubmitDocumentDto;
 import ru.kolivim.document.workflow.entity.Document;
 import ru.kolivim.document.workflow.entity.History;
@@ -25,6 +26,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RegisterServiceImpl implements RegisterService {
@@ -38,11 +40,13 @@ public class RegisterServiceImpl implements RegisterService {
     @Override
     @Transactional
     public CompletableFuture<List<SubmitDocumentDto>> parallelApproveOne(Long id, int threads, int attempts) {
+        log.info("startMethod, получен id: {}, threads: {}, attempts: {}", id, threads, attempts);
+
         ExecutorService executorService = Executors.newFixedThreadPool(threads);
         List<Long> idList = new ArrayList<>();
-        for (int i = 0; i < attempts; i++){
-            idList.add(id);
-        }
+
+        for (int i = 0; i < attempts; i++) idList.add(id);
+
         return CompletableFuture.supplyAsync(() -> approve(idList), executorService);
     }
 
@@ -80,19 +84,23 @@ public class RegisterServiceImpl implements RegisterService {
     @Override
     @Transactional
     public Register save(Document document) {
+
         Register register = Register.builder()
                 .document(document)
-                .status(Status.APPROVED)
+//                .status(Status.APPROVED)
                 .build();
         registerRepository.save(register);
+
         History history = History.builder()
-                .time(ZonedDateTime.now())
+                .date(ZonedDateTime.now())
                 .action(Action.APPROVE)
                 .author(register.getDocument().getAuthor())
                 .document(register.getDocument())
                 .build();
         historyRepository.save(history);
+
         document.setStatus(Status.APPROVED);
+
         Set<History> historySet = new HashSet<>();
         historySet.add(history);
         //document.getHistorySet().clear();
@@ -101,6 +109,7 @@ public class RegisterServiceImpl implements RegisterService {
 //            history1.setDocument(document);
 //        }
         document.setRegister(register);
+
         documentRepository.save(document);
         return register;
     }

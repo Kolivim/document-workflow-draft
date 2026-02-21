@@ -8,10 +8,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableAsync
 @EnableScheduling
-public class ItqTestTaskApplication {
+public class DocWorkflowApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ItqTestTaskApplication.class, args);
+        SpringApplication.run(DocWorkflowApplication.class, args);
     }
 
 }

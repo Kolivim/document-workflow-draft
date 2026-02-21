@@ -25,7 +25,9 @@ public interface DocumentService {
 
     List<SubmitDocumentDto> submit(List<Long> ids);
 
-    List<Document> findByStatusAuthorDate(Status status, Optional<String> author, Optional<ZonedDateTime> startDate, Optional<ZonedDateTime> endDate);
+    List<Document> findByStatusAuthorDate(Status status, Optional<String> author, Optional<ZonedDateTime> startDate,
+                                          Optional<ZonedDateTime> endDate);
 
     Document update(Document document);
+
 }

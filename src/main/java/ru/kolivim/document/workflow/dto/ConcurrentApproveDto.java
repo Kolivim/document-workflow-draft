@@ -11,6 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @Schema(description = "Документ отправленный на согласование/утверждение", type = "object")
 public class ConcurrentApproveDto {
+
     @Schema(description = "id")
     private Long id;
 
@@ -22,4 +23,5 @@ public class ConcurrentApproveDto {
 
     @Schema(description = "Финальный статус документа")
     private Status resultingDocumentStatus;
+
 }

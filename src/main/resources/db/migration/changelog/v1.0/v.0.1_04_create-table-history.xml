@@ -1,0 +1,48 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="4" author="Kolivim">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="history"/>
+            </not>
+        </preConditions>
+
+<!--        <setColumnRemarks -->
+<!--                catalogName="appledb" -->
+<!--                          columnName="apple_name" -->
+<!--                          remarks="column will store the name of the apples" -->
+<!--                          schemaName="appledb" -->
+<!--                          tableName="apple" -->
+<!--                          columnDataType="VARCHAR(20)"-->
+<!--        />-->
+
+        <createTable tableName="history" schemaName="doc_workflow">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="author" type="VARCHAR"/>
+            <column name="date" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="action" type="VARCHAR"/>
+            <column name="comment" type="VARCHAR"/>
+            <column name="document_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="document_id"
+                baseTableName="history"
+                baseTableSchemaName="doc_workflow"
+                constraintName="fk_document_id"
+                referencedColumnNames="id"
+                referencedTableName="documents"
+                referencedTableSchemaName="doc_workflow"/>
+    </changeSet>
+
+</databaseChangeLog>
+

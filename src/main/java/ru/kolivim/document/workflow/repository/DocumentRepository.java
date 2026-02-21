@@ -15,7 +15,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 
     Collection<? extends Document> findByAuthor(String author);
 
-    Collection<? extends Document> findByCreateTimeAfter(ZonedDateTime createTimeAfter);
+    Collection<? extends Document> findByCreateDateAfter(ZonedDateTime createTimeAfter);
 
-    Collection<? extends Document> findByCreateTimeBefore(ZonedDateTime endDate);
+    Collection<? extends Document> findByCreateDateBefore(ZonedDateTime endDate);
 }

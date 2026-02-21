@@ -1,0 +1,81 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+<!--    <changeSet id="1" author="Kolivim">-->
+
+<!--        <comment>Инициализация схемы doc_workflow</comment>-->
+
+<!--&lt;!&ndash;        <sqlCheck expectedResult="0">&ndash;&gt;-->
+<!--&lt;!&ndash;            SELECT count(*) FROM information_schema.schemata WHERE schema_name = 'doc_workflow'&ndash;&gt;-->
+<!--&lt;!&ndash;        </sqlCheck>&ndash;&gt;-->
+
+<!--        <sql splitStatements="true" endDelimiter=";">-->
+<!--            CREATE SCHEMA IF NOT EXISTS doc_workflow;-->
+<!--        </sql>-->
+
+
+<!--&lt;!&ndash;        <rollback>&ndash;&gt;-->
+<!--&lt;!&ndash;            <sql splitStatements="true" endDelimiter=";">&ndash;&gt;-->
+<!--&lt;!&ndash;                DROP SCHEMA IF EXISTS doc_workflow CASCADE;&ndash;&gt;-->
+<!--&lt;!&ndash;            </sql>&ndash;&gt;-->
+<!--&lt;!&ndash;        </rollback>&ndash;&gt;-->
+
+
+<!--    </changeSet>-->
+
+    <changeSet id="1" author="Kolivim">
+
+        <comment>Создание схемы doc_workflow если она не существует</comment>
+
+        <!-- Проверяем существование схемы -->
+<!--        <preConditions onFail="MARK_RAN">-->
+<!--            <sqlCheck expectedResult="0">-->
+<!--                SELECT COUNT(*)-->
+<!--                FROM pg_namespace-->
+<!--                WHERE nspname = 'doc_workflow'-->
+<!--            </sqlCheck>-->
+<!--        </preConditions>-->
+
+        <!-- Рабочая -->
+<!--        <sql splitStatements="true" endDelimiter=";">-->
+<!--            CREATE SCHEMA doc_workflow;-->
+<!--        </sql>-->
+
+
+        <!-- Создаем схему -->
+        <sql splitStatements="true" endDelimiter=";">
+            CREATE SCHEMA doc_workflow AUTHORIZATION "docWf";
+        </sql>
+
+
+        <!-- Даем права (опционально) -->
+<!--        <sql splitStatements="true" endDelimiter=";">-->
+<!--            GRANT ALL ON SCHEMA doc_workflow TO docWf;-->
+<!--        </sql>-->
+
+<!--        <rollback>-->
+<!--            <sql dbms="doc_workflow" splitStatements="true" endDelimiter=";">-->
+<!--                DROP SCHEMA IF EXISTS doc_workflow CASCADE;-->
+<!--            </sql>-->
+<!--        </rollback>-->
+
+    </changeSet>
+
+    <!-- Проверочный changeSet для убеждения -->
+<!--    <changeSet id="1.1" author="Kolivim" runAlways="true">-->
+<!--        <comment>Проверка создания схемы</comment>-->
+<!--        <sql dbms="postgresql" splitStatements="true" endDelimiter=";">-->
+<!--            DO $$-->
+<!--            BEGIN-->
+<!--            IF NOT EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'doc_workflow') THEN-->
+<!--                RAISE EXCEPTION 'Schema doc_workflow was not created';-->
+<!--            END IF;-->
+<!--            END $$;-->
+<!--        </sql>-->
+<!--    </changeSet>-->
+
+</databaseChangeLog>
+

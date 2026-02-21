@@ -1,4 +1,4 @@
-package ru.kolivim.document.workflow.mappers;
+package ru.kolivim.document.workflow.mapper;
 
 import ru.kolivim.document.workflow.dto.RegisterDto;
 import ru.kolivim.document.workflow.entity.Register;
@@ -9,6 +9,7 @@ import java.util.List;
 
 @Mapper
 public interface RegisterMapper {
+
     @Mapping(target = "document", ignore = true)
     Register dtoToEntity(RegisterDto registerDto);
 

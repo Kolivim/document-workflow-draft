@@ -12,15 +12,13 @@ import jakarta.persistence.*;
 @AllArgsConstructor
 @Table(name = "register", schema = "doc_workflow")
 public class Register {
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private Status status = Status.APPROVED;
-
     @OneToOne(mappedBy = "register")
     private Document document;
+
 }

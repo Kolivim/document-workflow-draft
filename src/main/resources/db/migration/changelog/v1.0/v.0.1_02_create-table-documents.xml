@@ -1,0 +1,72 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="2" author="Kolivim">
+
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists schemaName="doc_workflow" tableName="documents"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="documents" schemaName="doc_workflow">
+
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+
+            <column name="inner_id" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="author" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="status" type="VARCHAR(50)" defaultValue="DRAFT" value="('DRAFT', 'SUBMITTED', 'APPROVED')">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="create_date" type="TIMESTAMP WITH TIME ZONE" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="update_date" type="TIMESTAMP WITH TIME ZONE" defaultValueComputed="CURRENT_TIMESTAMP" />
+
+        </createTable>
+
+        <addUniqueConstraint
+                columnNames="inner_id"
+                constraintName="uk_documents_inner_id"
+                schemaName="doc_workflow"
+                tableName="documents"/>
+
+        <createIndex indexName="idx_documents_author" schemaName="doc_workflow" tableName="documents">
+            <column name="author"/>
+        </createIndex>
+
+        <sql>
+            COMMENT ON TABLE doc_workflow.documents IS 'Таблица документов';
+            COMMENT ON COLUMN doc_workflow.documents.id IS 'Идентификатор документа';
+            COMMENT ON COLUMN doc_workflow.documents.inner_id IS 'Внутренний идентификатор документа';
+            COMMENT ON COLUMN doc_workflow.documents.author IS 'Автор документа';
+            COMMENT ON COLUMN doc_workflow.documents.name IS 'Название документа';
+            COMMENT ON COLUMN doc_workflow.documents.status IS 'Статус документа (DRAFT, SUBMITTED, APPROVED)';
+            COMMENT ON COLUMN doc_workflow.documents.create_date IS 'Дата создания документа';
+            COMMENT ON COLUMN doc_workflow.documents.update_date IS 'Дата обновления статуса документа';
+        </sql>
+
+        <rollback>
+            <dropTable tableName="documents" schemaName="doc_workflow"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
+
