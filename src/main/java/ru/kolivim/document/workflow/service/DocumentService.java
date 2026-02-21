@@ -18,13 +18,13 @@ public interface DocumentService {
 
     Page<DocumentDto> getByAdvancedFilter(SearchDocumentDto searchDocumentDto, Pageable pageable);
 
+    DocumentDto create(DocumentDto DocumentDto);
+
 
 
     /** Устаревшие реализации далее */
     /******************************************************************************************************************/
 
-
-    Document create();
 
     DocumentDto entityToDto(Document document);
 

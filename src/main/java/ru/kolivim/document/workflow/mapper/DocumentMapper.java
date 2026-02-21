@@ -9,22 +9,37 @@ import ru.kolivim.document.workflow.entity.History;
 import ru.kolivim.document.workflow.entity.Register;
 import ru.kolivim.document.workflow.entity.enums.Action;
 import ru.kolivim.document.workflow.entity.enums.Status;
+import ru.kolivim.document.workflow.mapper.qualification.ToExistingEntity;
+import ru.kolivim.document.workflow.mapper.qualification.ToNewEntity;
 
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Mapper(componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE /*, uses = {RegisterMapper.class , HistoryMapper.class} */ )
 public interface DocumentMapper {
 
     @Mapping(target = "historySet", source = "historySet", qualifiedByName = "toEntityHistorySet")
     @Mapping(target = "register", source = "register", qualifiedByName = "toEntityRegister")
+    /* @ToExistingEntity */
     Document dtoToEntity(DocumentDto documentDto);
 
     @Mappings({
-            @Mapping(target = "historySet", source = "historySet", qualifiedByName = "toDtoHistorySet"),
-            @Mapping(target = "register", source = "register", qualifiedByName = "toDtoRegister"),
+            @Mapping(target = "historySet", ignore = true),
+            @Mapping(target = "register", ignore = true),
+            @Mapping(target = "status", source = "status", defaultValue = "DRAFT"),
+            @Mapping(target = "createDate", expression = "java(java.time.ZonedDateTime.now())"),
+            @Mapping(target = "updateDate", ignore = true)
+    })
+    /* @ToNewEntity */
+    @Named("dtoToNewEntity")
+    Document dtoToNewEntity(DocumentDto documentDto);
+
+    @Mappings({
+            @Mapping(target = "historySet", source = "historySet", qualifiedByName = "toDtoHistorySet", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL),
+            @Mapping(target = "register", source = "register", qualifiedByName = "toDtoRegister", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL),
             @Mapping(target = "description", ignore = true),
             @Mapping(target = "updateDate", ignore = true)
     })
@@ -61,7 +76,10 @@ public interface DocumentMapper {
 
     @Named("toDtoHistorySet")
     default Set<HistoryDto> toDtoHistorySet(Set<History> historySet){
+
         Set<HistoryDto> historyDtoSet = new HashSet<>();
+
+        if(historySet == null) return null;
 
         for (History history : new HashSet<>(historySet)) {
             historyDtoSet.add(HistoryDto.builder()
@@ -77,8 +95,10 @@ public interface DocumentMapper {
     @Named("toDtoRegister")
     default RegisterDto toDtoRegister(Register register){
 
+        if(register == null) return null;
+
         return RegisterDto.builder()
-                .id(register == null ? 0: register.getId())
+                .id(register == null ? 0 : register.getId())
 //                .status(register == null? Status.DRAFT: register.getStatus())
                 .document(register == null ? null:
                         DocumentDto.builder()
@@ -92,4 +112,5 @@ public interface DocumentMapper {
                                 .build())
                 .build();
     }
+
 }

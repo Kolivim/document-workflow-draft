@@ -23,8 +23,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kolivim.document.workflow.utils.specification.SpecificationUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
@@ -116,33 +118,72 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
 
+    @Override
+    @Transactional
+    public DocumentDto create(DocumentDto documentDto) {
+        log.debug("startMethod, documentDto: {}", documentDto);
+
+        Document document = documentMapper.dtoToNewEntity(documentDto);
+
+        DocumentDto returnDocumentDto = documentMapper.entityToDto(documentRepository.save(document));
+
+        log.debug("endMethod, к возврату documentDto: {}", documentDto);
+
+        return returnDocumentDto;
+
+//        return documentMapper.entityToDto(documentRepository.save(document));
+    }
+
+
+    public static UUID generateInnerId(String author, String name, ZonedDateTime date) {
+        log.debug("startMethod, author: {}, name: {}, date: {}", author, name, date);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+        String formattedDate = date.format(formatter);
+
+        String source = String.format("%s|%s|%s",
+                author != null ? author : "",
+                name != null ? name : "",
+                formattedDate
+        );
+
+//        UUID namespace = UUID.fromString("00000000-0000-0000-0000-000000000001");
+
+        log.debug("endMethod");
+        return UUID.nameUUIDFromBytes(source.getBytes(StandardCharsets.UTF_8));
+    }
+
+
+
     /** Устаревшие реализации далее */
     /******************************************************************************************************************/
 
 
+    @Deprecated
     @Override
-    @Transactional
-    public Document create() {
+    public List<Document> findByStatusAuthorDate(Status status, Optional<String> author, Optional<ZonedDateTime> startDate, Optional<ZonedDateTime> endDate) {
 
-        Document document = Document.builder()
-                .author(generateAuthor())
-                .createDate(ZonedDateTime.now())
-                .innerId(String.valueOf(Math.random()))
-                .status(Status.DRAFT)
-                .name(generateTitle()).build();
+        List<Document> documents = new ArrayList<>(documentRepository.findByStatus(status));
 
-        return documentRepository.save(document);
+        author.ifPresent(s -> documents.retainAll(documentRepository.findByAuthor(s)));
+        startDate.ifPresent(zonedDateTime -> documents.retainAll(documentRepository.findByCreateDateAfter(zonedDateTime)));
+        endDate.ifPresent(zonedDateTime -> documents.retainAll(documentRepository.findByCreateDateBefore(zonedDateTime)));
+
+        return documents;
     }
+
 
     @Override
     public DocumentDto entityToDto(Document document) {
         return documentMapper.entityToDto(document);
     }
 
+
     @Override
     public Document findById(Long id) {
         return documentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
     }
+
 
     @Override
     public Page<Document> findAll(Pageable pageable, List<Long> idList) {
@@ -201,19 +242,6 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
 
-    @Deprecated
-    @Override
-    public List<Document> findByStatusAuthorDate(Status status, Optional<String> author, Optional<ZonedDateTime> startDate, Optional<ZonedDateTime> endDate) {
-
-        List<Document> documents = new ArrayList<>(documentRepository.findByStatus(status));
-
-        author.ifPresent(s -> documents.retainAll(documentRepository.findByAuthor(s)));
-        startDate.ifPresent(zonedDateTime -> documents.retainAll(documentRepository.findByCreateDateAfter(zonedDateTime)));
-        endDate.ifPresent(zonedDateTime -> documents.retainAll(documentRepository.findByCreateDateBefore(zonedDateTime)));
-
-        return documents;
-    }
-
     @Override
     @Transactional
     public Document update(Document document) {
@@ -252,20 +280,28 @@ public class DocumentServiceImpl implements DocumentService {
         return newDocument;
     }
 
+
+    /** Вынести в Util GenerateDate */
     private String generateAuthor(){
-        List<String> authors = List.of("Steven Spielberg", "Martin Scorsese", "Christopher Nolan", "Alfred Hitchcock", "Stanley Kubrick");
+        List<String> authors = List.of("Steven Spielberg", "Martin Scorsese", "Christopher Nolan", "Alfred Hitchcock",
+                "Stanley Kubrick");
         Random rand = new Random();
         int n = rand.nextInt(authors.size());
         return authors.get(n);
     }
 
+
+    /** Вынести в Util GenerateDate */
     private String generateTitle(){
-        List<String> titles = List.of("Citizen Kane", "Casablanca", "The Godfather", "Gone with the Wind", "Lawrence of Arabia", "The Wizard of Oz");
+        List<String> titles = List.of("Citizen Kane", "Casablanca", "The Godfather", "Gone with the Wind",
+                "Lawrence of Arabia", "The Wizard of Oz");
         Random rand = new Random();
         int n = rand.nextInt(titles.size());
         return titles.get(n);
     }
 
+
+    /** Вынести в Util GenerateDate */
     @Transactional(propagation = Propagation.MANDATORY)
     Set<History> generateHistorySubmit(Document document){
         Set<History> histories = new HashSet<>();
