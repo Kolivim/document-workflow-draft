@@ -35,7 +35,8 @@ public class DocumentController {
     private final int pageSize = 200;
 
 
-    @Operation(summary = "Поиск", description = "Получение документов, c фильтрованием согласно переданным полям фильтра")
+    @Operation(summary = "Поиск",
+            description = "Получение документов, c фильтрованием согласно переданным полям фильтра")
     @PostMapping(value = "/filter", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Page<DocumentDto>> getByFilter(@RequestBody SearchDocumentDto searchDocumentDto,
@@ -47,7 +48,11 @@ public class DocumentController {
     }
 
 
-    @Operation(summary = "Поиск", description = "Получение документов, c фильтрованием согласно переданным полям фильтра, по расширенному списку обрабатываемых фильтром полей")
+    @Operation(summary = "Расширенный поиск",
+            description = """
+                    Получение документов, c фильтрованием согласно переданным полям фильтра, по расширенному списку 
+                    обрабатываемых фильтром полей
+                    """)
     @PostMapping(value = "/advancedFilter", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Page<DocumentDto>> getByAdvancedFilter(@RequestBody SearchDocumentDto searchDocumentDto,
@@ -59,24 +64,32 @@ public class DocumentController {
     }
 
 
+    @Operation(summary = "Создает документ", description = "Создает документ согласно полученным параметрам")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<DocumentDto> create(@RequestBody DocumentDto documentDto) {
+        return ResponseEntity.ok(service.create(documentDto));
+    }
+
+
     @Operation(summary = "Поиск", description = "Получение документов, c фильтрованием согласно переданным полям фильтра")
     @Deprecated
     @PostMapping(value = "/filterWithParameters", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Page<DocumentDto>> getByFilterWithParameters(@RequestBody DocumentDto documentDto,
-            /* @PageableDefault(size = 20, sort = "createDate", direction = Sort.Direction.DESC) */ Pageable page ,
+    public ResponseEntity<Page<DocumentDto>> getByFilterWithParameters(
+            @RequestBody DocumentDto documentDto,
+            @PageableDefault(size = 20, sort = "createDate", direction = Sort.Direction.DESC) Pageable page ,
 
-                                                         /** Формат: ISO 8601 с часовым поясом, например: 2024-01-15T10:30:00+03:00 */
-                                                         @Parameter(description = "Дата создания документа. Будут отобраны только документы, созданные после указанной даты")
-                                                         @RequestParam(required = false)
-                                                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                                                         ZonedDateTime startDate,
-                                                         @Parameter(description = "Дата создания документа. Будут отобраны только документы, созданные до указанной даты")
-                                                         @RequestParam(required = false)
-                                                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                                                         ZonedDateTime endDate
+            /** Формат: ISO 8601 с часовым поясом, например: 2024-01-15T10:30:00+03:00 */
+            @Parameter(description = "Дата создания документа. Будут отобраны только документы, созданные после указанной даты")
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            ZonedDateTime startDate,
+            @Parameter(description = "Дата создания документа. Будут отобраны только документы, созданные до указанной даты")
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            ZonedDateTime endDate
     ) {
-
         /** Реализовать через маппер */
         SearchDocumentDto searchDocumentDto = new SearchDocumentDto(documentDto, startDate, endDate);
         return ResponseEntity.ok(service.getByFilter(searchDocumentDto, page));
@@ -85,14 +98,6 @@ public class DocumentController {
 
     /** Далее устаревшая реализация, перепроверить */
     /******************************************************************************************************************/
-
-    @Operation(summary = "Создает документ", description = "Создает документ")
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<DocumentDto> createDocument(@RequestBody DocumentDto documentDto) {
-        final Document document = service.create();
-        return ResponseEntity.ok(service.entityToDto(document));
-    }
 
 
     @Operation(summary = "Поиск документа по его id", description = "Поиск документа по его id")
