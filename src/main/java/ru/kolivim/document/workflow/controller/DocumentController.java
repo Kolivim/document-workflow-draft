@@ -2,20 +2,19 @@ package ru.kolivim.document.workflow.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.kolivim.document.workflow.dto.DocumentDto;
-import ru.kolivim.document.workflow.dto.SearchDocumentDto;
-import ru.kolivim.document.workflow.dto.SubmitDocumentDto;
+import ru.kolivim.document.workflow.dto.*;
+import ru.kolivim.document.workflow.dto.response.DocumentPage;
+import ru.kolivim.document.workflow.dto.response.PageResponseDto;
 import ru.kolivim.document.workflow.entity.Document;
 import ru.kolivim.document.workflow.entity.enums.Status;
 import ru.kolivim.document.workflow.service.DocumentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -72,6 +71,119 @@ public class DocumentController {
     }
 
 
+    @Operation(summary = "Поиск документа", description = "Поиск документа по его id")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<DocumentDto> getDocumentById(
+            @Parameter(description = "Document", required = true) @PathVariable("id") long id) {
+        return ResponseEntity.ok(service.getById(id));
+    }
+
+
+    @Operation(summary = "Поиск документов",
+            description = "Возвращает список документов, по переданному в запросе списку id документов",
+            parameters = @Parameter(name = "author", description = "Отбираются только документы с указанными id"))
+    @Deprecated
+    @PostMapping(value = "/documents", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Документы успешно получены")
+//            @ApiResponse(responseCode = "400", description = "Некорректный запрос"),
+//            @ApiResponse(responseCode = "404", description = "Документы не найдены")
+//            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+    })
+    public ResponseEntity<Page<DocumentDto>> getDocumentByIdList(
+            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestBody DocumentsRequestDto documentsRequestDto) {
+
+        Page<DocumentDto> pageResult = service.getByIdList(pageable, documentsRequestDto.getIds());
+
+        return ResponseEntity.ok(pageResult);
+    }
+
+
+    @Operation(summary = "Поиск документов",
+            description = "Возвращает список документов, по переданному в запросе списку id документов",
+            parameters = @Parameter(name = "author", description = "Отбираются только документы с указанными id"))
+    @Deprecated
+    @PostMapping(value = "/documents/message", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Документы успешно получены")
+    })
+    public ResponseEntity<ru.kolivim.document.workflow.dto.response.ApiResponse<Page<DocumentDto>>> getDocumentByIdListWithMessage(
+            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestBody DocumentsRequestDto documentsRequestDto) {
+
+        /*
+        ru.kolivim.document.workflow.dto.response.ApiResponse<Page<DocumentDto>> pageResult = service.getByIdListWithNoFound(pageable, documentsRequestDto.getIds());
+
+        return ResponseEntity.ok(pageResult);
+        */
+
+        PageResponseDto pageResponseDto = service.getByIdListWithNoFound(pageable, documentsRequestDto.getIds());
+
+        ru.kolivim.document.workflow.dto.response.ApiResponse response =
+                ru.kolivim.document.workflow.dto.response.ApiResponse.success(pageResponseDto.getPage(),
+                        "Не найдено документов: ".concat(String.valueOf(pageResponseDto.getNotFoundCount())));
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @Operation(summary = "Поиск документов",
+            description = "Возвращает список документов, по переданному в запросе списку id документов",
+            parameters = @Parameter(name = "author", description = "Отбираются только документы с указанными id"))
+    @Deprecated
+    @PostMapping(value = "/documents/noFoundIds", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Документы успешно получены")
+    })
+    public ResponseEntity<PageResponseDto> getDocumentByIdListWithNoFoundIds(
+            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestBody DocumentsRequestDto documentsRequestDto) {
+
+        PageResponseDto pageResponseDto = service.getByIdListWithNoFound(pageable, documentsRequestDto.getIds());
+
+        return ResponseEntity.ok(pageResponseDto);
+    }
+
+
+    @Operation(summary = "Поиск документов",
+            description = "Возвращает список документов, по переданному в запросе списку id документов",
+            parameters = @Parameter(name = "author", description = "Отбираются только документы с указанными id"))
+    @Deprecated
+    @PostMapping(value = "/documents/extendedPage", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Документы успешно получены")
+    })
+    public ResponseEntity<Page<DocumentDto>> getDocumentByIdListWithExtendedPage(
+            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestBody DocumentsRequestDto documentsRequestDto) {
+
+        /* Page<DocumentDto> */ DocumentPage pageResult = service.getByIdListWithExtendedPage(pageable, documentsRequestDto.getIds());
+
+        return ResponseEntity.ok()
+                .header("X-Total-Requested", String.valueOf(pageResult.getTotalCount()))
+                .header("X-Not-Found-Count", String.valueOf(pageResult.getNotFoundCount()))
+                .body(pageResult);
+    }
+
+
+    @Operation(summary = "Поиск документов",
+            description = "Возвращает список документов, по переданному в запросе списку id документов",
+            parameters = @Parameter(name = "author", description = "Отбираются только документы с указанными id"))
+    @Deprecated
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<Page<DocumentDto>> getDocumentByIdListOld(Pageable pageable, @RequestParam List<Long> idList) {
+        return ResponseEntity.ok(service.getByIdList(pageable, idList));
+    }
+
+
     @Operation(summary = "Поиск", description = "Получение документов, c фильтрованием согласно переданным полям фильтра")
     @Deprecated
     @PostMapping(value = "/filterWithParameters", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -96,31 +208,9 @@ public class DocumentController {
     }
 
 
+
     /** Далее устаревшая реализация, перепроверить */
     /******************************************************************************************************************/
-
-
-    @Operation(summary = "Поиск документа по его id", description = "Поиск документа по его id")
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<DocumentDto> findDocumentById(
-            @Parameter(description = "Document", required = true) @PathVariable("id") long id) {
-        final Document document = service.findById(id);
-        return ResponseEntity.ok(service.entityToDto(document));
-    }
-
-
-    @Operation(summary = "Возвращает список документов",
-                description = "Возвращает список документов",
-                parameters = @Parameter(name = "author", description = "Отбираются только документы указанного автора"))
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<List<DocumentDto>> findAllDocument(Pageable pageable, @RequestParam List<Long> idList) {
-        Pageable paging = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
-        Page<Document> pageResult = service.findAll(paging, idList);
-        List<Document> batchedData = pageResult.getContent();
-        return ResponseEntity.ok(service.entitiesToDtos(batchedData));
-    }
 
 
     @Operation(summary = "Отправляет документ на согласование",

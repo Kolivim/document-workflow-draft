@@ -1,8 +1,12 @@
 package ru.kolivim.document.workflow.utils.specification;
 
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
+import ru.kolivim.document.workflow.entity.Document;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 public class SpecificationUtils {
 
@@ -61,6 +65,66 @@ public class SpecificationUtils {
             return criteriaBuilder.equal(root.get(field), dateTime);
         };
     }
+
+
+    /** Спецификация для поиска по списку Id */
+    public static <T> Specification<T> listIn(List<Long> idList) {
+        return (root, query, criteriaBuilder) -> {
+            if (idList == null || idList.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            return root.get("id").in(idList);
+        };
+    }
+
+
+    /** Спецификация для получения существующих ID из списка */
+    public static Specification<Document> existentIds(List<Long> idList) {
+        return (root, query, cb) -> {
+            query.select(root.get("id")).distinct(true);
+            return root.get("id").in(idList);
+        };
+    }
+
+
+    /** Спецификация для получения несуществующих ID через подзапрос */
+    public static Specification<Document> nonExistentIds(List<Long> idList) {
+        return (root, query, cb) -> {
+
+            /** Подзапрос для получения существующих ID */
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<Document> subRoot = subquery.from(Document.class);
+            subquery.select(subRoot.get("id"))
+                    .where(subRoot.get("id").in(idList));
+
+            /** Возвращаем ID из списка, которых нет в подзапросе */
+            return cb.and(
+                    root.get("id").in(idList),
+                    cb.not(root.get("id").in(subquery))
+            );
+        };
+
+    }
+
+
+    /** Спецификация для проверки множества ID */
+//    public static <T> Specification<T> idIn(Collection<Long> ids) {
+//        return (root, query, criteriaBuilder) -> {
+//
+//            Path<Long> idPath = root.get("id");
+//
+//            // Оптимизация для разных типов запросов
+//            if (query.getResultType() == Long.class) {
+//                // Для count запросов
+//                query.select(criteriaBuilder.countDistinct(root));
+//            } else if (query.getResultType() == Boolean.class) {
+//                // Для exists запросов
+//                query.select(criteriaBuilder.literal(1));
+//            }
+//
+//            return idPath.in(ids);
+//        };
+//    }
 
 
 }

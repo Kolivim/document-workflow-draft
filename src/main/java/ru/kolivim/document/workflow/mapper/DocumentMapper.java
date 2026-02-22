@@ -49,6 +49,8 @@ public interface DocumentMapper {
 
     List<DocumentDto> entitiesToDtos(List<Document> documents);
 
+//    Page<DocumentDto> entitiesToDtos(Page<Document> documents);
+
     @Named("toEntityHistorySet")
     default Set<History> toEntityHistorySet(Set<HistoryDto> historyDtoSet){
         Set<History> historySet = new HashSet<>();

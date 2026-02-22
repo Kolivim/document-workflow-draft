@@ -5,6 +5,8 @@ import org.springframework.data.jpa.domain.Specification;
 import ru.kolivim.document.workflow.dto.DocumentDto;
 import ru.kolivim.document.workflow.dto.SearchDocumentDto;
 import ru.kolivim.document.workflow.dto.SubmitDocumentDto;
+import ru.kolivim.document.workflow.dto.response.DocumentPage;
+import ru.kolivim.document.workflow.dto.response.PageResponseDto;
 import ru.kolivim.document.workflow.entity.Document;
 import ru.kolivim.document.workflow.entity.Document_;
 import ru.kolivim.document.workflow.entity.History;
@@ -28,6 +30,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static ru.kolivim.document.workflow.dto.response.ApiResponse.success;
 
 @Slf4j
 @Service
@@ -135,6 +140,89 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
 
+    @Override
+    public DocumentDto getById(Long id) {
+        log.debug("startMethod, id: {}", id);
+
+        Document document = documentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+
+        DocumentDto returnDocumentDto = documentMapper.entityToDto(document);
+
+        return returnDocumentDto;
+    }
+
+
+    @Override
+    public Page<DocumentDto> getByIdList(Pageable pageable, List<Long> idList) {
+        log.debug("startMethod, idList: {}", idList);
+
+        Specification documentSpecification = SpecificationUtils.in(Document_.ID, idList);
+        Page<Document> documents = documentRepository.findAll(documentSpecification, pageable);
+        Page<DocumentDto> documentsDto = documents.map(documentMapper::entityToDto);
+
+        log.debug("endMethod, Page documentsDto: {}", documentsDto);
+        return documentsDto;
+    }
+
+
+    @Override
+    public PageResponseDto /* ApiResponse */ getByIdListWithNoFound(Pageable pageable, List<Long> idList) {
+        log.debug("startMethod, idList: {}", idList);
+
+        Specification documentSpecification = SpecificationUtils.in(Document_.ID, idList);
+
+        Page<Document> documents = documentRepository.findAll(documentSpecification, pageable);
+        Page<DocumentDto> documentsDto = documents.map(documentMapper::entityToDto);
+
+        List<Long> notExistingIdList = getNotExistingIds(idList);
+
+        PageResponseDto pageResponseDto = new PageResponseDto(documentsDto, notExistingIdList,
+                notExistingIdList.size(), idList.size());
+
+        log.debug("endMethod, к возврату pageResponse: {}", pageResponseDto);
+        return pageResponseDto;
+    }
+
+
+    @Override
+    public /* Page<DocumentDto> */ DocumentPage getByIdListWithExtendedPage(Pageable pageable, List<Long> idList) {
+        log.debug("startMethod, idList: {}", idList);
+
+        Specification documentSpecification = SpecificationUtils.in(Document_.ID, idList);
+
+        Page<Document> documents = documentRepository.findAll(documentSpecification, pageable);
+        Page<DocumentDto> documentsDto = documents.map(documentMapper::entityToDto);
+
+        List<Long> notExistingIdList = getNotExistingIds(idList);
+
+        log.debug("endMethod, Page<DocumentDto> documentsDto: {}", documentsDto);
+
+        return new DocumentPage<>(
+                documentsDto.getContent(),
+                pageable,
+                documentsDto.getTotalElements(),
+                notExistingIdList,
+                notExistingIdList.size(),
+                idList.size()
+        );
+    }
+
+
+    public List<Long> getNotExistingIds(List<Long> idList) {
+        log.debug("startMethod, idList: {}", idList);
+
+        List<Long> existingIdInList = documentRepository.findAllExistingIds(idList);
+        Set<Long> existingIdSet = new HashSet<>(existingIdInList);
+
+        List<Long> notExistingIdInList = idList.stream()
+                .filter(id -> !existingIdSet.contains(id))
+                .collect(Collectors.toList());
+
+        log.debug("endMethod, notExistingIdInList: {}", notExistingIdInList);
+        return notExistingIdInList;
+    }
+
+
     public static UUID generateInnerId(String author, String name, ZonedDateTime date) {
         log.debug("startMethod, author: {}, name: {}, date: {}", author, name, date);
 
@@ -176,39 +264,6 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public DocumentDto entityToDto(Document document) {
         return documentMapper.entityToDto(document);
-    }
-
-
-    @Override
-    public Document findById(Long id) {
-        return documentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
-    }
-
-
-    @Override
-    public Page<Document> findAll(Pageable pageable, List<Long> idList) {
-        List<Document> documents = new ArrayList<>();
-        for (Long id: idList){
-            Document probe = new Document();
-            probe.setId(id);
-            ExampleMatcher matcher = ExampleMatcher.matching()
-                    .withIgnorePaths("innerId", "author", "title", "status", "createTime", "updateTime", "historySet", "register")
-                    .withMatcher("id", ExampleMatcher.GenericPropertyMatcher::startsWith);
-
-            Example<Document> documentExample = Example.of(probe, matcher);
-            Page<Document> documentPage = documentRepository.findAll(documentExample, pageable);
-            List<Document> documentList = documentPage.getContent();
-            documents.addAll(documentList);
-        }
-        Page<Document> resultPage;
-        if (!documents.isEmpty()) {
-            int start = (int) pageable.getOffset();
-            int end = Math.min((start + pageable.getPageSize()), documents.size());
-            resultPage = new PageImpl<>(documents.subList(start, end), pageable, documents.size());
-        } else {
-            resultPage = new PageImpl<>(documents, pageable, 0);
-        }
-        return resultPage;
     }
 
 

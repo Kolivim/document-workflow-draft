@@ -3,6 +3,8 @@ package ru.kolivim.document.workflow.service;
 import ru.kolivim.document.workflow.dto.DocumentDto;
 import ru.kolivim.document.workflow.dto.SearchDocumentDto;
 import ru.kolivim.document.workflow.dto.SubmitDocumentDto;
+import ru.kolivim.document.workflow.dto.response.DocumentPage;
+import ru.kolivim.document.workflow.dto.response.PageResponseDto;
 import ru.kolivim.document.workflow.entity.Document;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,17 +22,19 @@ public interface DocumentService {
 
     DocumentDto create(DocumentDto DocumentDto);
 
+    DocumentDto getById(Long id);
 
+    Page<DocumentDto> getByIdList(Pageable pageable, List<Long> idList);
+
+    /* ru.kolivim.document.workflow.dto.response.ApiResponse<Page<DocumentDto>> */ PageResponseDto getByIdListWithNoFound(Pageable pageable, List<Long> idList);
+
+    /* Page<DocumentDto> */ DocumentPage getByIdListWithExtendedPage(Pageable pageable, List<Long> idList);
 
     /** Устаревшие реализации далее */
     /******************************************************************************************************************/
 
 
     DocumentDto entityToDto(Document document);
-
-    Document findById(Long id);
-
-    Page<Document> findAll(Pageable pageable, List<Long> idList);
 
     List<DocumentDto> entitiesToDtos(List<Document> documents);
 

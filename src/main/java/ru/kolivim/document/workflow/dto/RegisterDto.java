@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Переводы документов в статус ЗАРЕГИСТРИРОВАН", type = "object")
+@Schema(description = "Переводы документов в статус APPROVE", type = "object")
 public class RegisterDto {
 
     @Schema(description = "id")
