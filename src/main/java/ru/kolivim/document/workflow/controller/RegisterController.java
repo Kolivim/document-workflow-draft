@@ -3,7 +3,7 @@ package ru.kolivim.document.workflow.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import ru.kolivim.document.workflow.dto.SubmitDocumentDto;
+import ru.kolivim.document.workflow.dto.response.DocumentSubmitResponseDto;
 import ru.kolivim.document.workflow.service.RegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -26,7 +26,7 @@ public class RegisterController {
                 description = "Утверждает документ(переводит в статус APPROVED)")
     @PutMapping(value = "/approve", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<List<SubmitDocumentDto>> approve(
+    public ResponseEntity<List<DocumentSubmitResponseDto>> approve(
             @Parameter(description = "Список идентификаторов документов, которые нужно утвердить", required = true)
             @RequestParam List<Long> idList) {
         return ResponseEntity.ok(service.approve(idList));
@@ -37,7 +37,7 @@ public class RegisterController {
                 description = "Запускает несколько параллельных попыток утвердить документ(перевести в статус APPROVED)")
     @PutMapping(value = "/parallelApproveOne", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public CompletableFuture<List<SubmitDocumentDto>> parallelApproveOne(
+    public CompletableFuture<List<DocumentSubmitResponseDto>> parallelApproveOne(
             @Parameter(description = "Идентификатор документа для утверждения", required = true)
             @RequestParam Long id,
             @Parameter(description = "Количество потоков, обрабатывающих документ", required = true)
@@ -52,7 +52,7 @@ public class RegisterController {
                 description = "Запускает несколько параллельных попыток утвердить документ(перевести в статус APPROVED)")
     @PutMapping(value = "/parallelApproveTwo", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public CompletableFuture<List<SubmitDocumentDto>> parallelApproveTwo(
+    public CompletableFuture<List<DocumentSubmitResponseDto>> parallelApproveTwo(
             @Parameter(description = "Идентификатор документа, который нужно утвердить", required = true)
             @RequestParam Long id) {
         return service.parallelApproveTwo(id);

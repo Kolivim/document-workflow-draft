@@ -1,4 +1,4 @@
-package ru.kolivim.document.workflow.dto;
+package ru.kolivim.document.workflow.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.kolivim.document.workflow.dto.DocumentDto;
 
 import java.util.List;
 import java.util.Map;

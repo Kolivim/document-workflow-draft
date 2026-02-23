@@ -1,7 +1,7 @@
 package ru.kolivim.document.workflow.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.kolivim.document.workflow.dto.SubmitDocumentDto;
+import ru.kolivim.document.workflow.dto.response.DocumentSubmitResponseDto;
 import ru.kolivim.document.workflow.entity.Document;
 import ru.kolivim.document.workflow.entity.History;
 import ru.kolivim.document.workflow.entity.Register;
@@ -39,7 +39,7 @@ public class RegisterServiceImpl implements RegisterService {
 
     @Override
     @Transactional
-    public CompletableFuture<List<SubmitDocumentDto>> parallelApproveOne(Long id, int threads, int attempts) {
+    public CompletableFuture<List<DocumentSubmitResponseDto>> parallelApproveOne(Long id, int threads, int attempts) {
         log.info("startMethod, получен id: {}, threads: {}, attempts: {}", id, threads, attempts);
 
         ExecutorService executorService = Executors.newFixedThreadPool(threads);
@@ -53,31 +53,31 @@ public class RegisterServiceImpl implements RegisterService {
 
     @Override
     @Transactional
-    public List<SubmitDocumentDto> approve(List<Long> ids) {
-        List<SubmitDocumentDto> submitDocumentDtoList = new ArrayList<>();
+    public List<DocumentSubmitResponseDto> approve(List<Long> ids) {
+        List<DocumentSubmitResponseDto> documentSubmitResponseDtoList = new ArrayList<>();
         for (Long id: ids){
             if (documentRepository.findById(id).isPresent()){
                 if (documentRepository.findById(id).get().getStatus() != Status.SUBMITTED){
-                    submitDocumentDtoList.add(new SubmitDocumentDto(id, OperationStatus.CONFLICT));
+                    documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.CONFLICT));
                 } else {
                     try {
                         save(documentRepository.findById(id).get());
-                        submitDocumentDtoList.add(new SubmitDocumentDto(id, OperationStatus.SUCCESS));
+                        documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.SUCCESS));
                     } catch (Exception e){
-                        submitDocumentDtoList.add(new SubmitDocumentDto(id, OperationStatus.REGISTER_MISTAKE));
+                        documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.ERROR));
                     }
                 }
             } else {
-                submitDocumentDtoList.add(new SubmitDocumentDto(id, OperationStatus.NOT_FOUND));
+                documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.NOT_FOUND));
             }
         }
-        return submitDocumentDtoList;
+        return documentSubmitResponseDtoList;
     }
 
     @Async
     @Transactional
     @Override
-    public CompletableFuture<List<SubmitDocumentDto>> parallelApproveTwo(Long id){
+    public CompletableFuture<List<DocumentSubmitResponseDto>> parallelApproveTwo(Long id){
         return CompletableFuture.completedFuture(approve(List.of(id)));
     }
 

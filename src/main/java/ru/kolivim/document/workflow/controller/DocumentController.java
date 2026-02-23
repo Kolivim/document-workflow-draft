@@ -9,8 +9,10 @@ import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.kolivim.document.workflow.dto.*;
+import ru.kolivim.document.workflow.dto.request.DocumentsRequestDto;
 import ru.kolivim.document.workflow.dto.response.DocumentPage;
 import ru.kolivim.document.workflow.dto.response.PageResponseDto;
+import ru.kolivim.document.workflow.dto.response.DocumentSubmitResponseDto;
 import ru.kolivim.document.workflow.entity.Document;
 import ru.kolivim.document.workflow.entity.enums.Status;
 import ru.kolivim.document.workflow.service.DocumentService;
@@ -108,9 +110,7 @@ public class DocumentController {
     @Deprecated
     @PostMapping(value = "/documents/message", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Документы успешно получены")
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Документы успешно получены")})
     public ResponseEntity<ru.kolivim.document.workflow.dto.response.ApiResponse<Page<DocumentDto>>> getDocumentByIdListWithMessage(
             @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestBody DocumentsRequestDto documentsRequestDto) {
@@ -138,9 +138,7 @@ public class DocumentController {
     @PostMapping(value = "/documents/noFoundIds", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Документы успешно получены")
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Документы успешно получены")})
     public ResponseEntity<PageResponseDto> getDocumentByIdListWithNoFoundIds(
             @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestBody DocumentsRequestDto documentsRequestDto) {
@@ -157,9 +155,7 @@ public class DocumentController {
     @Deprecated
     @PostMapping(value = "/documents/extendedPage", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Документы успешно получены")
-    })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Документы успешно получены")})
     public ResponseEntity<Page<DocumentDto>> getDocumentByIdListWithExtendedPage(
             @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestBody DocumentsRequestDto documentsRequestDto) {
@@ -190,7 +186,7 @@ public class DocumentController {
     @ResponseBody
     public ResponseEntity<Page<DocumentDto>> getByFilterWithParameters(
             @RequestBody DocumentDto documentDto,
-            @PageableDefault(size = 20, sort = "createDate", direction = Sort.Direction.DESC) Pageable page ,
+            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable page ,
 
             /** Формат: ISO 8601 с часовым поясом, например: 2024-01-15T10:30:00+03:00 */
             @Parameter(description = "Дата создания документа. Будут отобраны только документы, созданные после указанной даты")
@@ -208,18 +204,33 @@ public class DocumentController {
     }
 
 
+    @Operation(summary = "Отправляет список документов на согласование",
+            description = "При согласовании документ изменяет статус на SUBMITTED")
+    @PutMapping(value = "/submit", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<List<DocumentSubmitResponseDto>> submit(
+            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestBody DocumentsRequestDto documentsRequestDto
+    ) {
+        return ResponseEntity.ok(service.submit(pageable, documentsRequestDto));
+    }
+
+
+    @Operation(summary = "Отправляет список документов на согласование",
+            description = "При согласовании документ изменяет статус на SUBMITTED")
+    @PutMapping(value = "/submit/extend", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<List<DocumentSubmitResponseDto>> extendedSubmit(
+            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestBody DocumentsRequestDto documentsRequestDto
+    ) {
+        return ResponseEntity.ok(service.submit(pageable, documentsRequestDto));
+    }
+
+
 
     /** Далее устаревшая реализация, перепроверить */
     /******************************************************************************************************************/
-
-
-    @Operation(summary = "Отправляет документ на согласование",
-                description = "При согласовании документ переводит в статус SUBMITTED")
-    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<List<SubmitDocumentDto>> submit(@RequestParam List<Long> idList) {
-        return ResponseEntity.ok(service.submit(idList));
-    }
 
 
     @Deprecated

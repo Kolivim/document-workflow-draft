@@ -1,5 +1,6 @@
 package ru.kolivim.document.workflow.scheduler;
 
+import ru.kolivim.document.workflow.dto.request.DocumentsRequestDto;
 import ru.kolivim.document.workflow.entity.Document;
 import ru.kolivim.document.workflow.entity.enums.Status;
 import ru.kolivim.document.workflow.service.DocumentService;
@@ -72,7 +73,12 @@ public class WorkerScheduler {
 
     private void checkStatus(Status status, List<Long> list){
         if (status == Status.DRAFT){
-            documentService.submit(list);
+            documentService.submit(null,     //   TODO !!! Засетил Pageable как NULL , поправить !!!
+                    DocumentsRequestDto
+                            .builder()
+                            .ids(list)
+                            .build()
+                    );
             log.info("SUBMITTED documents {}", list.size());
             log.info("ids {}", Arrays.toString(list.toArray()));
         } else {

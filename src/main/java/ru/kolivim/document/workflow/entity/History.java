@@ -15,6 +15,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Table(name = "history", schema = "doc_workflow")
 public class History {
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

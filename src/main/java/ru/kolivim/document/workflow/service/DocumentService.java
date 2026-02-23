@@ -2,7 +2,8 @@ package ru.kolivim.document.workflow.service;
 
 import ru.kolivim.document.workflow.dto.DocumentDto;
 import ru.kolivim.document.workflow.dto.SearchDocumentDto;
-import ru.kolivim.document.workflow.dto.SubmitDocumentDto;
+import ru.kolivim.document.workflow.dto.request.DocumentsRequestDto;
+import ru.kolivim.document.workflow.dto.response.DocumentSubmitResponseDto;
 import ru.kolivim.document.workflow.dto.response.DocumentPage;
 import ru.kolivim.document.workflow.dto.response.PageResponseDto;
 import ru.kolivim.document.workflow.entity.Document;
@@ -30,6 +31,8 @@ public interface DocumentService {
 
     /* Page<DocumentDto> */ DocumentPage getByIdListWithExtendedPage(Pageable pageable, List<Long> idList);
 
+    List<DocumentSubmitResponseDto> submit(Pageable pageable, /* List<Long> idList */ DocumentsRequestDto documentsRequestDto);
+
     /** Устаревшие реализации далее */
     /******************************************************************************************************************/
 
@@ -37,8 +40,6 @@ public interface DocumentService {
     DocumentDto entityToDto(Document document);
 
     List<DocumentDto> entitiesToDtos(List<Document> documents);
-
-    List<SubmitDocumentDto> submit(List<Long> ids);
 
     @Deprecated
     List<Document> findByStatusAuthorDate(Status status, Optional<String> author,

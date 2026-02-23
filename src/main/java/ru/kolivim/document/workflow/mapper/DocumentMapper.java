@@ -39,9 +39,9 @@ public interface DocumentMapper {
 
     @Mappings({
             @Mapping(target = "historySet", source = "historySet", qualifiedByName = "toDtoHistorySet", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL),
-            @Mapping(target = "register", source = "register", qualifiedByName = "toDtoRegister", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL),
-            @Mapping(target = "description", ignore = true),
-            @Mapping(target = "updateDate", ignore = true)
+            @Mapping(target = "register", source = "register", qualifiedByName = "toDtoRegister", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
+//            @Mapping(target = "description", ignore = true),
+//            @Mapping(target = "updateDate", ignore = true)
     })
     DocumentDto entityToDto(Document document);
 

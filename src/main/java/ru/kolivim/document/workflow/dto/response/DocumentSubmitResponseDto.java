@@ -1,4 +1,4 @@
-package ru.kolivim.document.workflow.dto;
+package ru.kolivim.document.workflow.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import ru.kolivim.document.workflow.entity.enums.OperationStatus;
@@ -8,8 +8,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Документ отправленный на согласование/утверждение", type = "object")
-public class SubmitDocumentDto {
+@Schema(description = "Статус документа после отправки на согласование/утверждение", type = "object")
+public class DocumentSubmitResponseDto {
 
     @Schema(description = "id")
     private Long id;
