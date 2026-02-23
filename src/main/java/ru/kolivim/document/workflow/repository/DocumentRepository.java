@@ -1,14 +1,14 @@
 package ru.kolivim.document.workflow.repository;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import ru.kolivim.document.workflow.entity.Document;
 import ru.kolivim.document.workflow.entity.enums.Status;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.ZonedDateTime;
@@ -43,5 +43,15 @@ public interface DocumentRepository extends JpaRepository<Document, Long>, JpaSp
     Document getReferenceById(Long documentId);
 
     boolean existsByIdAndStatus(Long id, Status status);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT d FROM Document d WHERE d.status = :status ORDER BY d.createDate")
+    List<Document> findDocumentsByStatusWithLock(@Param("status") Status status, Pageable pageable);
+
+    @Query("SELECT COUNT(d) FROM Document d WHERE d.status = :status")
+    long countByStatus(@Param("status") Status status);
+
+//    @Lock(LockModeType.PESSIMISTIC_WRITE)
+//    List<Document> findAllWithLock(Specification<Document> spec, Pageable pageable);
 
 }

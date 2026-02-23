@@ -23,7 +23,7 @@ public class WorkerScheduler {
 
     private final DocumentService documentService;
 
-    @Value("${batchSize}")
+    @Value("${app.batch.size}")
     Integer batchSize;
 
 
