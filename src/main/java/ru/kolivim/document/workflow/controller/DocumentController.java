@@ -216,16 +216,40 @@ public class DocumentController {
     }
 
 
+//    @Operation(summary = "Отправляет список документов на согласование",
+//            description = "При согласовании документ изменяет статус на SUBMITTED")
+//    @PutMapping(value = "/submit/extend", produces = MediaType.APPLICATION_JSON_VALUE)
+//    @ResponseBody
+//    public ResponseEntity<List<DocumentSubmitResponseDto>> extendedSubmit(
+//            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+//            @RequestBody DocumentsRequestDto documentsRequestDto
+//    ) {
+//        return ResponseEntity.ok(service.submit(pageable, documentsRequestDto));
+//    }
+
+
     @Operation(summary = "Отправляет список документов на согласование",
             description = "При согласовании документ изменяет статус на SUBMITTED")
-    @PutMapping(value = "/submit/extend", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/approve", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<List<DocumentSubmitResponseDto>> extendedSubmit(
+    public ResponseEntity<List<DocumentSubmitResponseDto>> approve(
             @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestBody DocumentsRequestDto documentsRequestDto
     ) {
-        return ResponseEntity.ok(service.submit(pageable, documentsRequestDto));
+        return ResponseEntity.ok(service.approve(pageable, documentsRequestDto));
     }
+
+
+//    @Operation(summary = "Отправляет список документов на согласование",
+//            description = "При согласовании документ изменяет статус на SUBMITTED")
+//    @PutMapping(value = "/approve/extend", produces = MediaType.APPLICATION_JSON_VALUE)
+//    @ResponseBody
+//    public ResponseEntity<List<DocumentSubmitResponseDto>> extendedApprove(
+//            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+//            @RequestBody DocumentsRequestDto documentsRequestDto
+//    ) {
+//        return ResponseEntity.ok(service.approve(pageable, documentsRequestDto));
+//    }
 
 
 

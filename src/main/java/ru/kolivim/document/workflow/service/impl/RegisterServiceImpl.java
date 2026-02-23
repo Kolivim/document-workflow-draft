@@ -64,7 +64,7 @@ public class RegisterServiceImpl implements RegisterService {
                         save(documentRepository.findById(id).get());
                         documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.SUCCESS));
                     } catch (Exception e){
-                        documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.ERROR));
+                        documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.REGISTER_ERROR));
                     }
                 }
             } else {

@@ -37,10 +37,11 @@ public interface DocumentRepository extends JpaRepository<Document, Long>, JpaSp
     int updateStatusIfExpected(@Param("id") Long id,
                                @Param("expectedStatus") Status expectedStatus,
                                @Param("newStatus") Status newStatus);
-
     @Query("SELECT d.status FROM Document d WHERE d.id = :id")
     Optional<Status> findStatusById(@Param("id") Long id);
 
     Document getReferenceById(Long documentId);
+
+    boolean existsByIdAndStatus(Long id, Status status);
 
 }

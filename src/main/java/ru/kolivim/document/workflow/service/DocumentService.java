@@ -31,7 +31,9 @@ public interface DocumentService {
 
     /* Page<DocumentDto> */ DocumentPage getByIdListWithExtendedPage(Pageable pageable, List<Long> idList);
 
-    List<DocumentSubmitResponseDto> submit(Pageable pageable, /* List<Long> idList */ DocumentsRequestDto documentsRequestDto);
+    List<DocumentSubmitResponseDto> submit(Pageable pageable, DocumentsRequestDto documentsRequestDto);
+
+    List<DocumentSubmitResponseDto> approve(Pageable pageable, DocumentsRequestDto documentsRequestDto);
 
     /** Устаревшие реализации далее */
     /******************************************************************************************************************/
