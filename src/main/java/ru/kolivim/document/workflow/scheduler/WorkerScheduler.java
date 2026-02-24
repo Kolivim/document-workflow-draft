@@ -37,18 +37,18 @@ public class WorkerScheduler {
     public void init() {}
 
 
-    @Scheduled(cron = "0 */2 * * * *")
-    protected void approve() {
-        List<Document> documents = documentService.findByStatusAuthorDate(Status.SUBMITTED, Optional.empty(), Optional.empty(), Optional.empty());
-        workWithBatchSize(documents, batchSize, Status.SUBMITTED);
-    }
-
-
-    @Scheduled(cron = "0 */2 * * * *")
-    protected void submit() {
-        List<Document> documents = documentService.findByStatusAuthorDate(Status.DRAFT, Optional.empty(), Optional.empty(), Optional.empty());
-        workWithBatchSize(documents, batchSize, Status.DRAFT);
-    }
+//    @Scheduled(cron = "0 */2 * * * *")
+//    protected void approve() {
+//        List<Document> documents = documentService.findByStatusAuthorDate(Status.SUBMITTED, Optional.empty(), Optional.empty(), Optional.empty());
+//        workWithBatchSize(documents, batchSize, Status.SUBMITTED);
+//    }
+//
+//
+//    @Scheduled(cron = "0 */2 * * * *")
+//    protected void submit() {
+//        List<Document> documents = documentService.findByStatusAuthorDate(Status.DRAFT, Optional.empty(), Optional.empty(), Optional.empty());
+//        workWithBatchSize(documents, batchSize, Status.DRAFT);
+//    }
 
 
     private void workWithBatchSize(List<Document> documents,

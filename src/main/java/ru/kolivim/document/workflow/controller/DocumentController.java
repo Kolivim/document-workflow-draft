@@ -25,7 +25,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Tag(name = "Api сервиса Документов", description = "Сервис для создания, поиска получения и согласования по запросу Документов")
+@Tag(name = "Api сервиса Документов",
+        description = "Сервис для создания, поиска, получения и согласования по запросу Документов")
 @RestController("DocumentController")
 @RequestMapping("/api/v1/document")
 @RequiredArgsConstructor

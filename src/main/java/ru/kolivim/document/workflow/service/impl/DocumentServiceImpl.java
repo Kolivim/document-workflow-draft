@@ -29,7 +29,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.kolivim.document.workflow.utils.specification.SpecificationUtils;
+import ru.kolivim.document.workflow.util.specification.SpecificationUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;

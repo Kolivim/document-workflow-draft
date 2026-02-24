@@ -2,10 +2,7 @@ package ru.kolivim.document.workflow.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import ru.kolivim.document.workflow.entity.enums.Status;
 
@@ -14,6 +11,7 @@ import java.util.Set;
 
 @Data
 @SuperBuilder
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Для поиска документа/документов", type = "object")

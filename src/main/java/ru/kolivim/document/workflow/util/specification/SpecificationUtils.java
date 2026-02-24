@@ -1,4 +1,4 @@
-package ru.kolivim.document.workflow.utils.specification;
+package ru.kolivim.document.workflow.util.specification;
 
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;

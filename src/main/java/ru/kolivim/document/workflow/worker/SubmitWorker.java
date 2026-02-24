@@ -2,6 +2,8 @@ package ru.kolivim.document.workflow.worker;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -9,8 +11,10 @@ import ru.kolivim.document.workflow.config.BatchConfig;
 import ru.kolivim.document.workflow.service.DocumentProcessingService;
 
 @Slf4j
+//@Profile("!generator")
 @Component
 @AllArgsConstructor
+@ConditionalOnProperty(name = "app.workers.enabled", havingValue = "true", matchIfMissing = true)
 public class SubmitWorker {
 
     private final DocumentProcessingService processingService;

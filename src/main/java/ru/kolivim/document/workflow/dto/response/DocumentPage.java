@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 public class DocumentPage<T> extends PageImpl<T> {
 
     @Schema(description = "Список Id, не найденных в БД")

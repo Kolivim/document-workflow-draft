@@ -18,7 +18,7 @@ public class CreateScheduler {
 
     private final DocumentService documentService;
 
-    @Value("${number}")
+//    @Value("${number}")
     Integer number;
 
     public CreateScheduler(DocumentService documentService) {
@@ -28,30 +28,30 @@ public class CreateScheduler {
     @PostConstruct
     public void init() {}
 
-    @Scheduled(cron = "0 * * * * *")
-    //@Transactional
-    protected void create() {
-
-        log.info("startMethod, получено количество документов для создания = {}", number);
-
-        for (int i = 0; i < number; i++){
-
-
-            //  Создаём тестовые ДТОшки :
-            DocumentDto documentDto = new DocumentDto();
-            documentDto.setAuthor("Автор номер ".concat(String.valueOf(i)));
-            documentDto.setInnerId(ZonedDateTime.now().toInstant().toString().concat("_").concat(String.valueOf(i)));
-            documentDto.setName("Документ номер ".concat(String.valueOf(i)));
-                // SC
-            //  !Создаём тестовые ДТОшки
-
-
-            DocumentDto createDocumentDto = documentService.create(documentDto);
-            log.info("Создан документ с id: {}, итого обработано {} документов, из общего количества документов к созданию = {}",
-                    createDocumentDto.getId().toString(), i + 1, number);
-
-        }
-
-    }
+//    @Scheduled(cron = "0 * * * * *")
+//    //@Transactional
+//    protected void create() {
+//
+//        log.info("startMethod, получено количество документов для создания = {}", number);
+//
+//        for (int i = 0; i < number; i++){
+//
+//
+//            //  Создаём тестовые ДТОшки :
+//            DocumentDto documentDto = new DocumentDto();
+//            documentDto.setAuthor("Автор номер ".concat(String.valueOf(i)));
+//            documentDto.setInnerId(ZonedDateTime.now().toInstant().toString().concat("_").concat(String.valueOf(i)));
+//            documentDto.setName("Документ номер ".concat(String.valueOf(i)));
+//                // SC
+//            //  !Создаём тестовые ДТОшки
+//
+//
+//            DocumentDto createDocumentDto = documentService.create(documentDto);
+//            log.info("Создан документ с id: {}, итого обработано {} документов, из общего количества документов к созданию = {}",
+//                    createDocumentDto.getId().toString(), i + 1, number);
+//
+//        }
+//
+//    }
 
 }

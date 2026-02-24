@@ -26,7 +26,7 @@ spring:
     change-log: classpath:/db/migration/database-doc.workflow-changelog-master.xml
 #    change-log: classpath:/db/migration/database-doc.workflow-changelog-master.yaml
 
-number: 8
+
 
 app:
   batch:
@@ -35,6 +35,10 @@ app:
       fixed-delay: 100000
     approve:
       fixed-delay: 100000
+
+#generator:
+#  number: 15
+#  fixed-delay: 100000
 
 #batch-size: 10
 #fixed-delay: 600000
