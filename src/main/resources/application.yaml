@@ -32,9 +32,9 @@ app:
   batch:
     size: 10
     submit:
-      fixed-delay: 600000
+      fixed-delay: 100000
     approve:
-      fixed-delay: 900000
+      fixed-delay: 100000
 
 #batch-size: 10
 #fixed-delay: 600000

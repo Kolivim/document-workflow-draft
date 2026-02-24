@@ -1,11 +1,7 @@
 package ru.kolivim.document.workflow.worker;
 
-//import com.example.docservice.config.BatchConfig;
-//import com.example.docservice.service.DocumentProcessingService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

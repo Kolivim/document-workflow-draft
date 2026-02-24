@@ -11,7 +11,7 @@ import lombok.*;
 @Schema(description = "Статус документа после отправки на согласование/утверждение", type = "object")
 public class DocumentSubmitResponseDto {
 
-    @Schema(description = "id")
+    @Schema(description = "Id документа")
     private Long id;
 
     @Schema(description = "operationStatus")

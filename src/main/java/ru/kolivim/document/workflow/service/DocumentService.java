@@ -1,5 +1,6 @@
 package ru.kolivim.document.workflow.service;
 
+import org.springframework.data.domain.PageRequest;
 import ru.kolivim.document.workflow.dto.DocumentDto;
 import ru.kolivim.document.workflow.dto.SearchDocumentDto;
 import ru.kolivim.document.workflow.dto.request.DocumentsRequestDto;
@@ -34,6 +35,9 @@ public interface DocumentService {
     List<DocumentSubmitResponseDto> submit(Pageable pageable, DocumentsRequestDto documentsRequestDto);
 
     List<DocumentSubmitResponseDto> approve(Pageable pageable, DocumentsRequestDto documentsRequestDto);
+
+    List<Document> getByStatus(Status status, PageRequest pageRequest);
+
 
     /** Устаревшие реализации далее */
     /******************************************************************************************************************/

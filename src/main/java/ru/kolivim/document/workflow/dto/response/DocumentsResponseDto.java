@@ -20,20 +20,25 @@ import java.util.Map;
 @Schema(description = "Для возврата документа/документов, по переданному списку id документов, а также сообщений при наличии ошибок", type = "object")
 public class DocumentsResponseDto {
 
+    @Schema(description = "Обрработанные документы")
     private List<DocumentDto> documents;
 
-    /** Не найденные Id */
-    private Map<Long, String> notFoundIds;
+    @Schema(description = "Не найденные Id")
+    private List<Long> /* Map<Long, String> */ notFoundIds;
 
+    @Schema(description = "Общее направленное на обработку количество документов")
     private int totalRequested;
 
+    @Schema(description = "Общее количество найденных документов")
     private int totalFound;
 
+    @Schema(description = "Общее количество не найденных документов")
     private int totalNotFound;
 
-//    private NotFoundMetadata notFound;     private List<Long> ids;           // Список не найденных ID     private Map<Long, String> reasons; // Причины для каждого ID (опциональн
+    @Schema(description = "Успех обработки списка Id")
+    private boolean success;
 
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
-//    private String warning;
+    @Schema(description = "Сообщение")
+    private String message;
 
 }

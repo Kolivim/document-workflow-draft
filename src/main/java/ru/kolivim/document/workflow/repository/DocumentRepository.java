@@ -44,9 +44,9 @@ public interface DocumentRepository extends JpaRepository<Document, Long>, JpaSp
 
     boolean existsByIdAndStatus(Long id, Status status);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    /* @Lock(LockModeType.PESSIMISTIC_WRITE) */
     @Query("SELECT d FROM Document d WHERE d.status = :status ORDER BY d.createDate")
-    List<Document> findDocumentsByStatusWithLock(@Param("status") Status status, Pageable pageable);
+    List<Document> findDocumentsByStatus /* WithLock */ (@Param("status") Status status, Pageable pageable);
 
     @Query("SELECT COUNT(d) FROM Document d WHERE d.status = :status")
     long countByStatus(@Param("status") Status status);
