@@ -3,9 +3,10 @@ package ru.kolivim.document.workflow.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.kolivim.document.workflow.dto.DocumentDto;
-import ru.kolivim.document.workflow.dto.SearchDocumentDto;
+import ru.kolivim.document.workflow.dto.request.SearchDocumentDto;
 import ru.kolivim.document.workflow.dto.request.DocumentsRequestDto;
 import ru.kolivim.document.workflow.dto.response.DocumentSubmitResponseDto;
 import ru.kolivim.document.workflow.dto.response.DocumentPage;
@@ -147,6 +148,34 @@ public class DocumentServiceImpl implements DocumentService {
         return returnDocumentDto;
 
 //        return documentMapper.entityToDto(documentRepository.save(document));
+    }
+
+
+    @Override
+    public Document getDocumentById(Long id) {
+        log.debug("startMethod, id: {}", id);
+        return documentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+    }
+
+
+    @Override
+    public Optional<Document> getDocumentOptionalById(Long id) {
+        log.debug("startMethod, id: {}", id);
+        return documentRepository.findById(id);
+    }
+
+
+    @Override
+    public Optional<Status> getStatusOptionalById(Long id) {
+        log.debug("startMethod, id: {}", id);
+        return documentRepository.findStatusById(id);
+    }
+
+
+    @Override
+    public long registerCountByDocumentId(Long documentId) {
+        log.debug("startMethod, documentId: {}", documentId);
+        return registerRepository.countByDocumentId(documentId);
     }
 
 

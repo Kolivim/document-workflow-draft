@@ -1,16 +1,9 @@
 package ru.kolivim.document.workflow.scheduler;
 
-import ru.kolivim.document.workflow.dto.DocumentDto;
-import ru.kolivim.document.workflow.dto.SearchDocumentDto;
-import ru.kolivim.document.workflow.entity.Document;
 import ru.kolivim.document.workflow.service.DocumentService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.time.ZonedDateTime;
 
 @Slf4j
 @Component

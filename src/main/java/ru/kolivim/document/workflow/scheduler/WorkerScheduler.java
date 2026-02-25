@@ -4,11 +4,10 @@ import ru.kolivim.document.workflow.dto.request.DocumentsRequestDto;
 import ru.kolivim.document.workflow.entity.Document;
 import ru.kolivim.document.workflow.entity.enums.Status;
 import ru.kolivim.document.workflow.service.DocumentService;
-import ru.kolivim.document.workflow.service.RegisterService;
+import ru.kolivim.document.workflow.service.DocumentConcurrentService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -19,7 +18,7 @@ import java.util.stream.IntStream;
 @Component
 public class WorkerScheduler {
 
-    private final RegisterService registerService;
+    private final DocumentConcurrentService registerService;
 
     private final DocumentService documentService;
 
@@ -27,7 +26,7 @@ public class WorkerScheduler {
     Integer batchSize;
 
 
-    public WorkerScheduler(RegisterService registerService, DocumentService documentService) {
+    public WorkerScheduler(DocumentConcurrentService registerService, DocumentService documentService) {
         this.registerService = registerService;
         this.documentService = documentService;
     }
@@ -82,7 +81,7 @@ public class WorkerScheduler {
             log.info("SUBMITTED documents {}", list.size());
             log.info("ids {}", Arrays.toString(list.toArray()));
         } else {
-            registerService.approve(list);
+//            registerService.approve(list);
             log.info("APPROVED documents {}", list.size());
             log.info("ids {}", Arrays.toString(list.toArray()));
         }

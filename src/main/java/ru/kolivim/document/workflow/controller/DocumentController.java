@@ -10,6 +10,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.kolivim.document.workflow.dto.*;
 import ru.kolivim.document.workflow.dto.request.DocumentsRequestDto;
+import ru.kolivim.document.workflow.dto.request.SearchDocumentDto;
 import ru.kolivim.document.workflow.dto.response.DocumentPage;
 import ru.kolivim.document.workflow.dto.response.PageResponseDto;
 import ru.kolivim.document.workflow.dto.response.DocumentSubmitResponseDto;

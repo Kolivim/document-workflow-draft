@@ -1,13 +1,11 @@
-package ru.kolivim.document.workflow.dto;
+package ru.kolivim.document.workflow.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import ru.kolivim.document.workflow.entity.enums.Status;
+import ru.kolivim.document.workflow.dto.DocumentDto;
 
 import java.time.ZonedDateTime;
-import java.util.Set;
 
 @Data
 @SuperBuilder
@@ -41,19 +39,5 @@ public class SearchDocumentDto extends DocumentDto {
         this.endDate = endDate;
 
     }
-
-
-    /*
-    @Builder
-    public SearchDocumentDto(Long id, String innerId, String author, String name, String description,
-                             Status status, ZonedDateTime createDate, ZonedDateTime updateDate,
-                             ZonedDateTime startDate, ZonedDateTime endDate) {
-
-        super(id, innerId, author, name, description, status, createDate, updateDate, null , null );
-        this.startDate = startDate;
-        this.endDate = endDate;
-
-    }
-    */
 
 }

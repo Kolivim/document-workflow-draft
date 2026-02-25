@@ -1,8 +1,9 @@
 package ru.kolivim.document.workflow.service;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.repository.query.Param;
 import ru.kolivim.document.workflow.dto.DocumentDto;
-import ru.kolivim.document.workflow.dto.SearchDocumentDto;
+import ru.kolivim.document.workflow.dto.request.SearchDocumentDto;
 import ru.kolivim.document.workflow.dto.request.DocumentsRequestDto;
 import ru.kolivim.document.workflow.dto.response.DocumentSubmitResponseDto;
 import ru.kolivim.document.workflow.dto.response.DocumentPage;
@@ -24,7 +25,15 @@ public interface DocumentService {
 
     DocumentDto create(DocumentDto DocumentDto);
 
+    Document getDocumentById(Long id);
+
+    Optional<Document> getDocumentOptionalById(Long id);
+
+    Optional<Status> getStatusOptionalById(Long id);
+
     DocumentDto getById(Long id);
+
+    long registerCountByDocumentId(Long documentId);
 
     Page<DocumentDto> getByIdList(Pageable pageable, List<Long> idList);
 
