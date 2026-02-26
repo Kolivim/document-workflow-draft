@@ -1,5 +1,6 @@
 package ru.kolivim.document.workflow.client;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
@@ -127,7 +128,7 @@ public class DocumentApiClient {
      * @return DTO с результатами обработки через API
      */
     public DocumentBatchResponse approveDocuments(DocumentsRequestDto request) {
-        log.info("startMethod approveDocuments, request: {}", request);
+        log.info("startMethod, к утверждению (APPROVE)  request: {}", request);
 
         try {
 
@@ -188,72 +189,6 @@ public class DocumentApiClient {
         }
 
     }
-
-
-//    public DocumentBatchResponse submitDocumentsV2(DocumentsRequestDto request) {
-//        log.info("startMethod, к отправке (SUBMITTED) получены request: {}", request);
-//
-//        try {
-//
-//            String url = baseUrl + "/submit";
-//            log.info("Отправка запроса (SUBMITTED) на URL: {} для {} документов", url, request.getIds().size());
-//
-//
-//            HttpEntity<DocumentsRequestDto> requestEntity = new HttpEntity<>(request);
-//
-//            ResponseEntity<List<DocumentSubmitResponseDto>> response = restTemplate.exchange(
-//                    url,
-//                    HttpMethod.PUT,
-//                    requestEntity,
-//                    new ParameterizedTypeReference<List<DocumentSubmitResponseDto>>() {}
-//            );
-//
-//
-//            log.info("Получен ответ от API: statusCode = {}", response.getStatusCode());
-//
-//            List<DocumentSubmitResponseDto> responseBody = response.getBody();
-//
-//            if (responseBody != null) {
-//
-//                log.info("Документы успешно отправлены на согласование (SUBMITTED), обработано: {}", responseBody.size());
-//
-//                return DocumentBatchResponse.builder()
-//                        .success(true)
-//                        .message("Успешно отправлено (SUBMITTED) " + responseBody.size() + " документов")
-//                        .processedIds(responseBody.stream()
-//                                .map(DocumentSubmitResponseDto::getId)
-//                                .collect(Collectors.toList()))
-//                        .failedIds(List.of())
-//                        .build();
-//
-//            } else {
-//
-//                log.info("Получен пустой ответ от API");
-//
-//                return DocumentBatchResponse.builder()
-//                        .success(true)
-//                        .message("Нет обрабатываемых документов")
-//                        .processedIds(List.of())
-//                        .failedIds(List.of())
-//                        .build();
-//
-//            }
-//
-//        } catch (Exception e) {
-//
-//            log.error("Ошибка при отправке документов на согласование (SUBMITTED) на URL: {}, Exception: {}",
-//                    baseUrl + "/submit", e.getMessage(), e);
-//
-//            return DocumentBatchResponse.builder()
-//                    .success(false)
-//                    .message("Ошибка вызова API: " + e.getMessage())
-//                    .processedIds(null)
-//                    .failedIds(request.getIds())
-//                    .build();
-//
-//        }
-//
-//    }
 
 
 }

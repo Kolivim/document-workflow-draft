@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 @Schema(description = "Попытки")
+@Builder
 public class AttemptDetailDto {
 
     @Schema(description = "Номер потока")

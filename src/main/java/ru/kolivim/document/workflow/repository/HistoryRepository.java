@@ -7,10 +7,4 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface HistoryRepository extends JpaRepository<History, Long> {
-
-//    List<History> findByDocumentIdOrderByChangedAtDesc(Long documentId);
-//
-//    List<History> findByDocumentIdInOrderByChangedAtDesc(List<Long> documentIds);
-
-}
+public interface HistoryRepository extends JpaRepository<History, Long> {}

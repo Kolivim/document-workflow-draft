@@ -107,24 +107,4 @@ public class SpecificationUtils {
     }
 
 
-    /** Спецификация для проверки множества ID */
-//    public static <T> Specification<T> idIn(Collection<Long> ids) {
-//        return (root, query, criteriaBuilder) -> {
-//
-//            Path<Long> idPath = root.get("id");
-//
-//            // Оптимизация для разных типов запросов
-//            if (query.getResultType() == Long.class) {
-//                // Для count запросов
-//                query.select(criteriaBuilder.countDistinct(root));
-//            } else if (query.getResultType() == Boolean.class) {
-//                // Для exists запросов
-//                query.select(criteriaBuilder.literal(1));
-//            }
-//
-//            return idPath.in(ids);
-//        };
-//    }
-
-
 }

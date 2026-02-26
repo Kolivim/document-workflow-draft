@@ -22,14 +22,10 @@ public class ApproveWorker {
     private final BatchConfig batchConfig;
 
 
-    /*
-    public ApproveWorker(DocumentProcessingService processingService, BatchConfig batchConfig) {
-        this.processingService = processingService;
-        this.batchConfig = batchConfig;
-    }
-    */
-
-
+    /**
+     * Периодическая проверка и утверждение документов (APPROVE).
+     * Выполняется с фиксированной задержкой, заданной в конфигурационном файле.
+     */
     @Async("taskExecutor")
     @Scheduled(fixedDelayString = "${app.batch.approve.fixed-delay}")
     public void processApproveBatch() {
@@ -42,7 +38,7 @@ public class ApproveWorker {
             int processedCount = processingService.processApproveBatch(batchConfig.getSize());
             long duration = System.currentTimeMillis() - startTime;
 
-            log.debug("Отправлено на Утверждение {} документов за {} мс", processedCount, duration);
+            log.debug("Отправлено на Утверждение (APPROVE) {} документов за {} мс", processedCount, duration);
 
         } catch (Exception e) {
             log.error("CATCH в ApproveWorker, e: {}", e.getMessage());

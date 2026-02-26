@@ -23,8 +23,7 @@ public interface DocumentMapper {
 
     @Mapping(target = "historySet", source = "historySet", qualifiedByName = "toEntityHistorySet")
     @Mapping(target = "register", source = "register", qualifiedByName = "toEntityRegister")
-    /* @ToExistingEntity */
-    Document dtoToEntity(DocumentDto documentDto);
+    Document dtoToEntity(DocumentDto documentDto);                                                                      /** @ToExistingEntity */
 
     @Mappings({
             @Mapping(target = "historySet", ignore = true),
@@ -33,23 +32,18 @@ public interface DocumentMapper {
             @Mapping(target = "createDate", expression = "java(java.time.ZonedDateTime.now())"),
             @Mapping(target = "updateDate", ignore = true)
     })
-    /* @ToNewEntity */
     @Named("dtoToNewEntity")
-    Document dtoToNewEntity(DocumentDto documentDto);
+    Document dtoToNewEntity(DocumentDto documentDto);                                                                   /** @ToNewEntity */
 
     @Mappings({
             @Mapping(target = "historySet", source = "historySet", qualifiedByName = "toDtoHistorySet", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL),
             @Mapping(target = "register", source = "register", qualifiedByName = "toDtoRegister", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
-//            @Mapping(target = "description", ignore = true),
-//            @Mapping(target = "updateDate", ignore = true)
     })
     DocumentDto entityToDto(Document document);
 
     List<Document> dtosToEntities(List<DocumentDto> documentDtos);
 
     List<DocumentDto> entitiesToDtos(List<Document> documents);
-
-//    Page<DocumentDto> entitiesToDtos(Page<Document> documents);
 
     @Named("toEntityHistorySet")
     default Set<History> toEntityHistorySet(Set<HistoryDto> historyDtoSet){
@@ -70,7 +64,6 @@ public interface DocumentMapper {
     default Register toEntityRegister(RegisterDto registerDto){
         return Register.builder()
                 .id(registerDto == null? 0: registerDto.getId())
-//                .status(registerDto == null? Status.DRAFT: registerDto.getStatus())
                 .build();
     }
 
@@ -101,7 +94,6 @@ public interface DocumentMapper {
 
         return RegisterDto.builder()
                 .id(register == null ? 0 : register.getId())
-//                .status(register == null? Status.DRAFT: register.getStatus())
                 .document(register == null ? null:
                         DocumentDto.builder()
                                 .id(register.getDocument().getId())

@@ -10,10 +10,10 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 
 @Data
+@Schema(description = "Документ", type = "object")
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Документ", type = "object")
 public class DocumentDto {
 
     @Schema(description = "id")

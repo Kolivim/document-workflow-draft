@@ -18,7 +18,7 @@ import java.util.List;
                 а также сообщений при наличии ошибок""", type = "object")
 public class PageResponseDto {
 
-    private Page page;   /* private Page<T> page; */
+    private Page page;
 
     @Schema(description = "Список Id, не найденных в БД")
     private List<Long> notFoundIds;

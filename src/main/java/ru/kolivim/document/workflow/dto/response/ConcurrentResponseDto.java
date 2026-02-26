@@ -1,7 +1,7 @@
 package ru.kolivim.document.workflow.dto.response;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import ru.kolivim.document.workflow.entity.enums.Status;
 
 @Data

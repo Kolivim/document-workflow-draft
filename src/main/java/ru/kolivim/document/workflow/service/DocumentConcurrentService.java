@@ -13,18 +13,4 @@ public interface DocumentConcurrentService {
 
     ConcurrentResponseDto concurrentApprove(ConcurrentApproveRequest request);
 
-    ConcurrentResponseDto concurrentHttpApprove(ConcurrentApproveRequest request);
-
-    /***********************************************************************************************************/
-
-
-//    List<DocumentSubmitResponseDto> approve(List<Long> ids);
-//
-//    CompletableFuture<List<DocumentSubmitResponseDto>> parallelApproveOne(Long id, int threads, int attempts) throws InterruptedException;
-//
-//    CompletableFuture<List<DocumentSubmitResponseDto>> parallelApproveTwo(Long id);
-//
-//    Register save(Document document);
-
-
 }

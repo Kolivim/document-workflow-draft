@@ -37,29 +37,14 @@ public interface DocumentService {
 
     Page<DocumentDto> getByIdList(Pageable pageable, List<Long> idList);
 
-    /* ru.kolivim.document.workflow.dto.response.ApiResponse<Page<DocumentDto>> */ PageResponseDto getByIdListWithNoFound(Pageable pageable, List<Long> idList);
+    PageResponseDto getByIdListWithNoFound(Pageable pageable, List<Long> idList);
 
-    /* Page<DocumentDto> */ DocumentPage getByIdListWithExtendedPage(Pageable pageable, List<Long> idList);
+    DocumentPage getByIdListWithExtendedPage(Pageable pageable, List<Long> idList);
 
     List<DocumentSubmitResponseDto> submit(Pageable pageable, DocumentsRequestDto documentsRequestDto);
 
     List<DocumentSubmitResponseDto> approve(Pageable pageable, DocumentsRequestDto documentsRequestDto);
 
     List<Document> getByStatus(Status status, PageRequest pageRequest);
-
-
-    /** Устаревшие реализации далее */
-    /******************************************************************************************************************/
-
-
-    DocumentDto entityToDto(Document document);
-
-    List<DocumentDto> entitiesToDtos(List<Document> documents);
-
-    @Deprecated
-    List<Document> findByStatusAuthorDate(Status status, Optional<String> author,
-                                          Optional<ZonedDateTime> startDate, Optional<ZonedDateTime> endDate);
-
-    Document update(Document document);
 
 }

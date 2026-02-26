@@ -22,12 +22,6 @@ public class SubmitWorker {
     private final BatchConfig batchConfig;
 
 
-//    public SubmitWorker(DocumentProcessingService processingService, BatchConfig batchConfig) {
-//        this.processingService = processingService;
-//        this.batchConfig = batchConfig;
-//    }
-
-
     @Async("taskExecutor")
     @Scheduled(fixedDelayString = "${app.batch.approve.fixed-delay}")
     public void processSubmitBatch() {

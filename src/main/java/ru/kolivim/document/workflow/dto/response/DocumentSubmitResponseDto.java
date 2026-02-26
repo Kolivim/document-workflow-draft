@@ -5,10 +5,10 @@ import ru.kolivim.document.workflow.entity.enums.OperationStatus;
 import lombok.*;
 
 @Data
+@Schema(description = "Статус документа после отправки на согласование/утверждение", type = "object")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Статус документа после отправки на согласование/утверждение", type = "object")
 public class DocumentSubmitResponseDto {
 
     @Schema(description = "Id документа")

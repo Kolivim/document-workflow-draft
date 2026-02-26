@@ -6,10 +6,10 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 @Data
+@Schema(description = "Переводы документов в статус APPROVE", type = "object")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Переводы документов в статус APPROVE", type = "object")
 public class RegisterDto {
 
     @Schema(description = "id")

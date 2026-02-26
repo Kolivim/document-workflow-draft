@@ -19,4 +19,5 @@ public interface RegisterMapper {
     List<Register> dtosToEntities(List<RegisterDto> registerDtos);
 
     List<RegisterDto> entitiesToDtos(List<Register> registers);
+
 }

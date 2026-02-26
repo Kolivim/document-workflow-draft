@@ -54,26 +54,12 @@ public class GeneratorService {
     @PostConstruct
     public void init() throws IOException {
 
-        /** Загружаем параметры по умолчанию из конфигурационного файла */
+        /** Загружает параметры по умолчанию из конфигурационного файла */
         properties.loadFromDefaultFile();
 
         this.totalDocuments = properties.getTotalDocuments();
 
         log.info("Получено для создания следующее количество документов: {}", totalDocuments);
-
-        /*
-        try {
-            properties.loadFromDefaultFile();
-            log.info("Параметры загружены из файла: {}", properties.getConfigFile());
-        } catch (IOException e) {
-            log.error("Ошибка загрузки файла конфигурации IOException: {}, \n\t\t\tИспользуются параметры по умолчанию",
-                    e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.error("Ошибка проверки обязательных параметров конфигурационного файла IllegalArgumentException: {}" +
-                            "\n\t\t\tРабота утилиты остановлена", e.getMessage());
-            System.exit(1);
-        }
-        */
 
     }
 
@@ -157,14 +143,6 @@ public class GeneratorService {
         }
 
 
-        /** Задержка между запросами */
-        /*
-        try {
-            Thread.sleep(properties.getDelayMs());
-        } catch (InterruptedException ignored) {}
-        */
-
-
         log.info("endMethod, отправлен запрос на создание документа {} из {}", index, total);
     }
 
@@ -190,7 +168,7 @@ public class GeneratorService {
 
         long duration = System.currentTimeMillis() - startTime;
 
-        log.info("\n╔══════════════════════════════════════════════════════════════╗");
+        log.info("╔══════════════════════════════════════════════════════════════╗");
         log.info("║                     ГЕНЕРАЦИЯ ЗАВЕРШЕНА                      ║");
         log.info("╚══════════════════════════════════════════════════════════════╝");
         log.info("⏱️  Время выполнения: {} мс ({} сек)", duration, duration / 1000);

@@ -7,13 +7,13 @@ import jakarta.persistence.*;
 
 import java.time.ZonedDateTime;
 
+@Table(name = "history", schema = "doc_workflow")
 @Entity
 @Setter
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "history", schema = "doc_workflow")
 public class History {
 
     @Id

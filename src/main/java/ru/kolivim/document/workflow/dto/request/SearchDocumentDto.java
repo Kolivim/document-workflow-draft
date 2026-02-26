@@ -8,11 +8,11 @@ import ru.kolivim.document.workflow.dto.DocumentDto;
 import java.time.ZonedDateTime;
 
 @Data
+@Schema(description = "Для поиска документа/документов", type = "object")
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Для поиска документа/документов", type = "object")
 public class SearchDocumentDto extends DocumentDto {
 
     @Schema(description = "Дата создания, позднее которой будут отобраны документы")

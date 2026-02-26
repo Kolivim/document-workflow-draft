@@ -8,10 +8,10 @@ import lombok.*;
 import java.time.ZonedDateTime;
 
 @Data
+@Schema(description = "История изменения документа", type = "object")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "История изменения документа", type = "object")
 public class HistoryDto {
 
     @Schema(description = "id")

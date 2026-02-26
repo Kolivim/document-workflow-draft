@@ -17,13 +17,13 @@ import java.util.Properties;
 public class GeneratorProperties {
 
     /** URL API для создания Документов */
-    private String apiUrl /* = "http://localhost:8080/api/v1/document/create" */ ;
+    private String apiUrl;
 
     /** Автор документов */
-    private String author /* = "generator" */ ;
+    private String author;
 
     /** Статус создаваемых документов (всегда DRAFT) */
-    private Status status /* = Status.DRAFT */ ;
+    private Status status;
 
     /** Количество создаваемых Документов, в 1 пачке */
     private int number;
@@ -71,7 +71,7 @@ public class GeneratorProperties {
         }
 
 
-        /** Читаем статус из файла */
+        /** Читает статус из файла */
         if (props.containsKey("status")) {
 
             try {
@@ -109,7 +109,6 @@ public class GeneratorProperties {
         log.info("\t👤 Автор: {}", this.author);
         log.info("\t📌 Статус: {}", this.status);
         log.info("\t🌐 API URL: {}\n", this.apiUrl);
-//        log.info("\t📁 Файл конфигурации: {}\n", getConfigFile());
 
     }
 

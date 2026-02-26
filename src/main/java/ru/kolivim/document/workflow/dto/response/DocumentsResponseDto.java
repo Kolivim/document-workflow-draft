@@ -17,14 +17,15 @@ import java.util.Map;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Для возврата документа/документов, по переданному списку id документов, а также сообщений при наличии ошибок", type = "object")
+@Schema(description = "Для возврата документа/документов, по переданному списку id документов, " +
+        "а также сообщений при наличии ошибок", type = "object")
 public class DocumentsResponseDto {
 
     @Schema(description = "Обрработанные документы")
     private List<DocumentDto> documents;
 
     @Schema(description = "Не найденные Id")
-    private List<Long> /* Map<Long, String> */ notFoundIds;
+    private List<Long> notFoundIds;
 
     @Schema(description = "Общее направленное на обработку количество документов")
     private int totalRequested;

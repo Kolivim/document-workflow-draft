@@ -17,14 +17,11 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Data
+@Slf4j
 @Service
 @AllArgsConstructor
 public class DocumentProcessingService {
-
-    /** ТехДолг : вынести в сервис и вызвать из него уже */
-//    private final DocumentRepository documentRepository;
 
     private final DocumentService documentService;
 

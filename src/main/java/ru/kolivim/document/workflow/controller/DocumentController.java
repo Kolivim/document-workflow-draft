@@ -117,12 +117,6 @@ public class DocumentController {
             @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestBody DocumentsRequestDto documentsRequestDto) {
 
-        /*
-        ru.kolivim.document.workflow.dto.response.ApiResponse<Page<DocumentDto>> pageResult = service.getByIdListWithNoFound(pageable, documentsRequestDto.getIds());
-
-        return ResponseEntity.ok(pageResult);
-        */
-
         PageResponseDto pageResponseDto = service.getByIdListWithNoFound(pageable, documentsRequestDto.getIds());
 
         ru.kolivim.document.workflow.dto.response.ApiResponse response =
@@ -162,7 +156,7 @@ public class DocumentController {
             @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestBody DocumentsRequestDto documentsRequestDto) {
 
-        /* Page<DocumentDto> */ DocumentPage pageResult = service.getByIdListWithExtendedPage(pageable, documentsRequestDto.getIds());
+        DocumentPage pageResult = service.getByIdListWithExtendedPage(pageable, documentsRequestDto.getIds());
 
         return ResponseEntity.ok()
                 .header("X-Total-Requested", String.valueOf(pageResult.getTotalCount()))
@@ -218,18 +212,6 @@ public class DocumentController {
     }
 
 
-//    @Operation(summary = "Отправляет список документов на согласование",
-//            description = "При согласовании документ изменяет статус на SUBMITTED")
-//    @PutMapping(value = "/submit/extend", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @ResponseBody
-//    public ResponseEntity<List<DocumentSubmitResponseDto>> extendedSubmit(
-//            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
-//            @RequestBody DocumentsRequestDto documentsRequestDto
-//    ) {
-//        return ResponseEntity.ok(service.submit(pageable, documentsRequestDto));
-//    }
-
-
     @Operation(summary = "Отправляет список документов на согласование",
             description = "При согласовании документ изменяет статус на SUBMITTED")
     @PutMapping(value = "/approve", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -239,50 +221,6 @@ public class DocumentController {
             @RequestBody DocumentsRequestDto documentsRequestDto
     ) {
         return ResponseEntity.ok(service.approve(pageable, documentsRequestDto));
-    }
-
-
-//    @Operation(summary = "Отправляет список документов на согласование",
-//            description = "При согласовании документ изменяет статус на SUBMITTED")
-//    @PutMapping(value = "/approve/extend", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @ResponseBody
-//    public ResponseEntity<List<DocumentSubmitResponseDto>> extendedApprove(
-//            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
-//            @RequestBody DocumentsRequestDto documentsRequestDto
-//    ) {
-//        return ResponseEntity.ok(service.approve(pageable, documentsRequestDto));
-//    }
-
-
-
-    /** Далее устаревшая реализация, перепроверить */
-    /******************************************************************************************************************/
-
-
-    @Deprecated
-    @Operation(summary = "Поиск", description = "Получение документов, c фильтрованием согласно переданным полям фильтра")
-    @GetMapping(value = "/byStatusAuthorDate", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<List<DocumentDto>> findByStatusAuthorDate(
-            @Parameter(description = "Статус документа. Будут отобраны только документы с указанным статусом")
-            @RequestParam
-            Status status,
-            @Parameter(description = "Автор документа. Будут отобраны только документы с указанным автором")
-            @RequestParam(required = false)
-            String author,
-            @Parameter(description = "Дата создания документа. Будут отобраны только документы после указанной даты")
-            @RequestParam(required = false)
-            ZonedDateTime startDate,
-            @Parameter(description = "Дата создания документа. Будут отобраны только документы до указанной даты")
-            @RequestParam(required = false)
-            ZonedDateTime endDate
-    ) {
-
-        final List<Document> documents = service.findByStatusAuthorDate(status,
-                Optional.ofNullable(author), Optional.ofNullable(startDate), Optional.ofNullable(endDate));
-
-        return ResponseEntity.ok(service.entitiesToDtos(documents));
-/* @RequestBody TaskDTO taskDTO, Pageable page */
     }
 
 }

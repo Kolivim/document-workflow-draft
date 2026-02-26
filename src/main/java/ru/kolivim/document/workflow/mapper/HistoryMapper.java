@@ -9,6 +9,7 @@ import java.util.Set;
 
 @Mapper
 public interface HistoryMapper {
+
     @Mapping(target = "document", ignore = true)
     History dtoToEntity(HistoryDto historyDto);
 

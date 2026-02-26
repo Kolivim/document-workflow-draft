@@ -19,15 +19,15 @@ import java.util.UUID;
  * @author Kolivim
  */
 
+@Table(name = "documents", schema = "doc_workflow")
 @Entity
-@NamedQuery(name = "selectDocument", query = "SELECT e FROM Document e",
-        hints = @QueryHint(name = "org.hibernate.fetchSize", value = "100"))
 @Setter
 @Getter
 @Builder
+@NamedQuery(name = "selectDocument", query = "SELECT e FROM Document e",
+        hints = @QueryHint(name = "org.hibernate.fetchSize", value = "100"))
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "documents", schema = "doc_workflow")
 public class Document {
 
     @Id

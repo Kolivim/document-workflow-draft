@@ -31,185 +31,8 @@ public class DocumentConcurrentServiceImpl implements DocumentConcurrentService 
 
     private final DocumentService documentService;
 
-//    private final RegisterRepository registerRepository;
 
-//    private final RestTemplate restTemplate;
-//    private final String baseUrl = "http://localhost:8080/api";                                                         /** Базовый URL API (должен быть настроен в конфигурации) */
-
-
-    /** Многопоточное подтверждение документа через Http */
-    public ConcurrentResponseDto concurrentHttpApprove(ConcurrentApproveRequest request){
-        log.debug("startMethod, request: {}", request);
-
-
-        /*
-
-        Document document = getCorrectDocument(request.getDocumentId());
-        //  1 :
-//        Optional<Document> documentOptional = documentRepository.findById(request.getDocumentId());
-//        if(!documentOptional.isPresent()) return null - Написать реализацию ответа - Документ не найден;
-//        Document document = documentOptional.get();
-//
-//
-//        if (document.getStatus() != Status.SUBMITTED.SUBMITTED) {
-//            return null - Написать реализацию ответа - Статус документа не соответствует требуемому (SUBMITTED);
-//        }
-        //  !1
-
-
-        /** Создаем пул потоков
-        ExecutorService executorService = Executors.newFixedThreadPool(threads);
-
-
-        /** Счетчики результатов
-        AtomicInteger successCount = new AtomicInteger(0);
-        AtomicInteger conflictCount = new AtomicInteger(0);
-        AtomicInteger errorCount = new AtomicInteger(0);
-
-
-        /** Детали попыток
-        List<ConcurrentTestResult.AttemptDetail> attemptDetails = Collections.synchronizedList(new ArrayList<>());
-
-
-        /** Счетчик для ожидания завершения
-        CountDownLatch latch = new CountDownLatch(threads * attempts);
-
-
-        /** Запускаем параллельные попытки
-        for (int t = 0; t < threads; t++) {
-            final int threadNumber = t + 1;
-
-            for (int a = 0; a < attempts; a++) {
-
-                final int attemptNumber = a + 1;
-
-                executorService.submit(() -> {
-
-                    try {
-
-                        /** ИСПОЛЬЗУЕМ СУЩЕСТВУЮЩИЙ API УТВЕРЖДЕНИЯ
-                        String url = baseUrl + "/documents/approve?ids=" + documentId
-                                + "&initiator=concurrent-test&comment=Concurrent test (thread="
-                                + threadNumber + ",attempt=" + attemptNumber + ")";
-
-                        log.debug("Thread {}/{}: Calling approve API", threadNumber, attemptNumber);
-
-                        // Вызываем существующий endpoint
-                        ResponseEntity<ApproveResult[]> response = restTemplate.exchange(
-                                url,
-                                HttpMethod.POST,
-                                null,
-                                ApproveResult[].class
-                        );
-
-
-                        /** Анализируем результат
-                        ApproveResult[] results = response.getBody();
-                        if (results != null && results.length > 0) {
-                            ApproveResult result = results[0];
-
-                            ConcurrentTestResult.AttemptDetail detail =
-                                    ConcurrentTestResult.AttemptDetail.builder()
-                                            .threadNumber(threadNumber)
-                                            .attemptNumber(attemptNumber)
-                                            .status(mapResultStatus(result.getStatus()))
-                                            .message(result.getMessage())
-                                            .build();
-
-                            attemptDetails.add(detail);
-
-                            // Обновляем счетчики
-                            switch (result.getStatus()) {
-                                case "SUCCESS":
-                                    successCount.incrementAndGet();
-                                    log.info("Thread {}/{}: SUCCESS - Document approved",
-                                            threadNumber, attemptNumber);
-                                    break;
-                                case "CONFLICT":
-                                    conflictCount.incrementAndGet();
-                                    log.debug("Thread {}/{}: CONFLICT - {}",
-                                            threadNumber, attemptNumber, result.getMessage());
-                                    break;
-                                default:
-                                    errorCount.incrementAndGet();
-                                    log.warn("Thread {}/{}: ERROR - {}",
-                                            threadNumber, attemptNumber, result.getMessage());
-                            }
-                        }
-
-                    } catch (Exception e) {
-                        log.error("Thread {}/{}: EXCEPTION - {}",
-                                threadNumber, attemptNumber, e.getMessage());
-
-                        errorCount.incrementAndGet();
-                        attemptDetails.add(ConcurrentTestResult.AttemptDetail.builder()
-                                .threadNumber(threadNumber)
-                                .attemptNumber(attemptNumber)
-                                .status("ERROR")
-                                .message("API call failed: " + e.getMessage())
-                                .build());
-                    } finally {
-                        latch.countDown();
-                    }
-                });
-            }
-        }
-
-
-        /** Ожидаем завершения всех попыток
-        try {
-            latch.await(60, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("Test interrupted", e);
-        }
-
-
-        /** Завершаем пул потоков
-        executorService.shutdown();
-
-
-        /** Получаем финальный статус
-        Document finalDocument = documentRepository.findById(documentId).orElse(null);
-        String finalStatus = finalDocument != null ? finalDocument.getStatus().name() : "UNKNOWN";
-
-
-        /** Проверяем записи в реестре
-        long registryCount = registryRepository.countByDocumentId(documentId);
-
-
-        /** Формируем результат
-        ConcurrentTestResult result = ConcurrentTestResult.builder()
-                .documentId(documentId)
-                .finalStatus(finalStatus)
-                .successfulApprovals(successCount.get())
-                .conflicts(conflictCount.get())
-                .errors(errorCount.get())
-                .totalAttempts(threads * attempts)
-                .registryEntriesCount(registryCount)
-                .attemptDetails(attemptDetails)
-                .build();
-
-
-        log.info("=== CONCURRENT TEST COMPLETED ===");
-        log.info("Final document status: {}", finalStatus);
-        log.info("Registry entries created: {}", registryCount);
-        log.info("Successful approvals: {}", result.getSuccessfulApprovals());
-        log.info("Conflicts: {}", result.getConflicts());
-        log.info("Errors: {}", result.getErrors());
-        log.info("Total attempts: {}", result.getTotalAttempts());
-        log.info("==================================");
-
-
-//        return result;
-      */
-
-        return null;
-
-    }
-
-
-    /** Многопоточное подтверждение документа через DocumentService */
+    /** Многопоточное подтверждение документа */
     public ConcurrentResponseDto concurrentApprove(ConcurrentApproveRequest request){
         log.debug("startMethod, request: {}", request);
 
@@ -289,7 +112,6 @@ public class DocumentConcurrentServiceImpl implements DocumentConcurrentService 
                                 allResults.add(detail);
 
 
-                                //
                                 if (result.getOperationStatus().equals(OperationStatus.SUCCESS)) {
                                     successCount.incrementAndGet();
                                     log.debug("Thread: {} c attemptNumber: {} SUCCESS - Документ утверждён (APPROVED)",
@@ -301,12 +123,10 @@ public class DocumentConcurrentServiceImpl implements DocumentConcurrentService 
                                     errorCount.incrementAndGet();
                                     log.debug("Thread: {} c attemptNumber: {} ERROR", threadNumber, attemptNumber);
                                 }
-                                //
 
 
                             } else {
 
-                                /** Ошибка */
                                 allResults.add(
                                         AttemptDetailDto.builder()
                                                 .threadNumber(threadNumber)
@@ -339,7 +159,6 @@ public class DocumentConcurrentServiceImpl implements DocumentConcurrentService 
 
                         } catch (Exception e) {
 
-                            /** Ошибка */
                             allResults.add(
                                     AttemptDetailDto.builder()
                                             .threadNumber(threadNumber)
@@ -353,10 +172,6 @@ public class DocumentConcurrentServiceImpl implements DocumentConcurrentService 
                             log.error("Thread: {} c attemptNumber: {} ERROR, Exception: {}",
                                     threadNumber, attemptNumber, e.getMessage());
                         }
-
-
-                        /** Небольшая задержка между попытками в одном потоке */
-                        /* Thread.sleep(5); */
 
                     }
 
@@ -404,17 +219,13 @@ public class DocumentConcurrentServiceImpl implements DocumentConcurrentService 
         }
 
 
-        //
         /** Проверяем финальный статус документа */
         Status finalStatus = null;
         Optional<Status> finalStatusOptional = documentService.getStatusOptionalById(request.getDocumentId());
         if(finalStatusOptional.isPresent()) finalStatus = finalStatusOptional.get();
-//        boolean isCorrectStatus = finalStatus != null && finalStatus.equals(Status.APPROVED);
 
         /** Проверяем количество записей в реестре */
-        long registryCount = documentService.registerCountByDocumentId(request.getDocumentId());                        // registerRepository.countByDocumentId(request.getDocumentId());
-//        boolean isCorrectRegisterCount = registryCount == 1;
-        //
+        long registryCount = documentService.registerCountByDocumentId(request.getDocumentId());
 
         boolean isSuccessWorkApprove = isSuccessWorkApprove(finalStatus, registryCount,
                 request.getThreads(), request.getAttempts(),
@@ -432,7 +243,7 @@ public class DocumentConcurrentServiceImpl implements DocumentConcurrentService 
                 .status(finalStatus)
                 .countSuccessfulApprove(successCount.get())
                 .countFailedApprove(conflictCount.get() + errorCount.get())
-                .isSuccess( isSuccessWorkApprove /* isCorrectStatus && isCorrectRegisterCount && isSuccessWork.get() */ )
+                .isSuccess(isSuccessWorkApprove)
                 .build();
 
     }
@@ -464,105 +275,6 @@ public class DocumentConcurrentServiceImpl implements DocumentConcurrentService 
     }
 
 
-
-
-    /** Многопоточное подтверждение документа через DocumentService */
-    public ConcurrentResponseDto concurrentApproveV1(ConcurrentApproveRequest request){
-        log.debug("startMethod, request: {}", request);
-
-        /*
-        Document document = getCorrectDocument(request.getDocumentId());
-        //  1:
-//        Optional<Document> documentOptional = documentRepository.findById(request.getDocumentId());
-//        if(!documentOptional.isPresent()) return null - Написать реализацию ответа - Документ не найден ;
-//        Document document = documentOptional.get();
-//
-//
-//        if (document.getStatus() != Status.SUBMITTED.SUBMITTED) {
-//            return null Написать реализацию ответа - Статус документа не соответствует требуемому (SUBMITTED) ;
-//        }
-        //  !1
-
-
-        // A1 : Запускаем параллельные попытки
-        ExecutorService executor = Executors.newFixedThreadPool(request.getThreads());
-//        CountDownLatch latch = new CountDownLatch(request.getThreads() * request.getAttempts());
-
-        List<Future<AttemptDetailDto>> futures = new ArrayList<>();                                                     //  AttemptDetailDto - То что вернется из Future
-
-        // Для КАЖДОГО потока создаем одну задачу, которая делает несколько попыток
-        for (int t = 0; t < threads; t++) {
-            final int threadNumber = t + 1;
-
-            Callable<List<AttemptDetailDto>> threadTask = () -> {
-                List<AttemptDetailDto> threadResults = new ArrayList<>();
-
-                // Внутри одного потока делаем attempts попыток ПОСЛЕДОВАТЕЛЬНО
-                for (int a = 0; a < attempts; a++) {
-                    final int attemptNumber = a + 1;
-
-                    log.debug("Thread {}/{}: Starting attempt", threadNumber, attemptNumber);
-
-                    try {
-
-                        Document approved = documentService.approveDocument(
-                                documentId,
-                                "concurrent-tester",
-                                String.format("Thread %d, attempt %d", threadNumber, attemptNumber)
-                        );
-
-                        threadResults.add(AttemptDetailDto.success(
-                                threadNumber,
-                                attemptNumber,
-                                "Document approved"
-                        ));
-
-                    } catch (ObjectOptimisticLockingFailureException e) {
-                        threadResults.add(AttemptDetailDto.conflict(
-                                threadNumber,
-                                attemptNumber,
-                                "Optimistic lock - document was modified by another thread"
-                        ));
-                    } catch (Exception e) {
-                        threadResults.add(AttemptDetailDto.error(
-                                threadNumber,
-                                attemptNumber,
-                                e.getMessage()
-                        ));
-                    }
-                }
-
-                return threadResults;
-            };
-
-            threadFutures.add(executor.submit(threadTask));
-        }
-
-
-        // Собираем результаты от всех потоков
-        List<AttemptDetailDto> allResults = new ArrayList<>();
-        for (Future<List<AttemptDetailDto>> future : threadFutures) {
-
-            try {
-                allResults.addAll(future.get(30, TimeUnit.SECONDS));
-            } catch (Exception e) {
-                log.error("Failed to get results from thread", e);
-            }
-
-        }
-
-        executor.shutdown();
-
-        // Анализируем результаты
-        return analyzeResults(documentId, allResults);
-        // !A1 Запускаем параллельные попытки
-        */
-
-
-        return null;
-    }
-
-
     private Document getCorrectDocument(Long documentId) {
         log.debug("startMethod, documentId: {}", documentId);
 
@@ -576,136 +288,11 @@ public class DocumentConcurrentServiceImpl implements DocumentConcurrentService 
 
         if (document.getStatus() != Status.SUBMITTED.SUBMITTED) {
             log.info("Не корректный статус документа с documentId: {}", documentId);
-            return null /** Написать далее реализацию ответа - Статус документа не соответствует требуемому (SUBMITTED) */ ;
+            return null;
         }
 
         log.debug("endMethod, к возврату document: {}", document);
         return document;
     }
-
-
-    private ConcurrentStatus getConcurrentApproveStatus(OperationStatus documentOperationStatus) {
-        log.debug("startMethod, к возврату OperationStatus documentOperationStatus: {}", documentOperationStatus);
-
-        switch (documentOperationStatus) {
-
-            case SUCCESS: return ConcurrentStatus.SUCCESS;
-
-            case CONFLICT: return ConcurrentStatus.CONFLICT;
-
-            default: return ConcurrentStatus.ERROR;
-
-        }
-
-    }
-
-
-    private String mapResultStatus(String apiStatus) {
-
-        switch (apiStatus) {
-            case "SUCCESS": return "SUCCESS";
-            case "CONFLICT": return "CONFLICT";
-            default: return "ERROR";
-        }
-
-    }
-
-
-
-
-
-//    @Override
-//    @Transactional
-//    public CompletableFuture<List<DocumentSubmitResponseDto>> parallelApproveOne(Long id, int threads, int attempts) {
-//        log.info("startMethod, получен id: {}, threads: {}, attempts: {}", id, threads, attempts);
-//
-//        ExecutorService executorService = Executors.newFixedThreadPool(threads);
-//        List<Long> idList = new ArrayList<>();
-//
-//        for (int i = 0; i < attempts; i++) idList.add(id);
-//
-//        return CompletableFuture.supplyAsync(() -> approve(idList), executorService);
-//    }
-//
-//
-//    @Override
-//    @Transactional
-//    public List<DocumentSubmitResponseDto> approve(List<Long> ids) {
-//        List<DocumentSubmitResponseDto> documentSubmitResponseDtoList = new ArrayList<>();
-//        for (Long id: ids){
-//            if (documentRepository.findById(id).isPresent()){
-//                if (documentRepository.findById(id).get().getStatus() != Status.SUBMITTED){
-//                    documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.CONFLICT));
-//                } else {
-//                    try {
-//                        save(documentRepository.findById(id).get());
-//                        documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.SUCCESS));
-//                    } catch (Exception e){
-//                        documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.REGISTER_ERROR));
-//                    }
-//                }
-//            } else {
-//                documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.NOT_FOUND));
-//            }
-//        }
-//        return documentSubmitResponseDtoList;
-//    }
-//
-//
-//    @Async
-//    @Transactional
-//    @Override
-//    public CompletableFuture<List<DocumentSubmitResponseDto>> parallelApproveTwo(Long id){
-//        return CompletableFuture.completedFuture(approve(List.of(id)));
-//    }
-//
-//
-//    @Override
-//    @Transactional
-//    public Register save(Document document) {
-//
-//        Register register = Register.builder()
-//                .document(document)
-////                .status(Status.APPROVED)
-//                .build();
-//        registerRepository.save(register);
-//
-//        History history = History.builder()
-//                .date(ZonedDateTime.now())
-//                .action(Action.APPROVE)
-//                .author(register.getDocument().getAuthor())
-//                .document(register.getDocument())
-//                .build();
-//        historyRepository.save(history);
-//
-//        document.setStatus(Status.APPROVED);
-//
-//        Set<History> historySet = new HashSet<>();
-//        historySet.add(history);
-//        //document.getHistorySet().clear();
-//        document.getHistorySet().addAll(historySet);
-////        for (History history1 : historySet) {
-////            history1.setDocument(document);
-////        }
-//        document.setRegister(register);
-//
-//        documentRepository.save(document);
-//        return register;
-//    }
-//
-//    @Transactional
-//    protected Set<History> generateHistoryApprove(Document document){
-//        Set<History> histories = new HashSet<>();
-//        History history = History.builder()
-//                .action(Action.APPROVE)
-//                .time(ZonedDateTime.now())
-//                .author(document.getAuthor())
-//                .document(document)
-//                .build();
-//        histories.add(history);
-//        historyRepository.save(history);
-//        return histories;
-//    }
-
 
 }

@@ -60,7 +60,7 @@ public class DocumentServiceImpl implements DocumentService {
 
 
     /**
-     @return Page со списком документов , удовлетворяющих полученным в параметрах условиям,
+     @return Page со списком документов, удовлетворяющих полученным в параметрах условиям,
             таким как : статус, автор, период дат создания
      */
     @Override
@@ -74,18 +74,6 @@ public class DocumentServiceImpl implements DocumentService {
                                 getSearchStartDate(searchDocumentDto.getStartDate()),
                                 getSearchEndDate(searchDocumentDto.getEndDate())));
 
-
-        /*
-        Specification documentSpecification = SpecificationUtils.in(Document_.STATUS, searchDocumentDto.getStatus())
-                .and(SpecificationUtils.like(Document_.AUTHOR, searchDocumentDto.getAuthor())
-                        .and(SpecificationUtils.betweenDate(
-                                Document_.CREATE_DATE,
-                                getSearchStartDate(searchDocumentDto.getStartDate()),
-                                getSearchEndDate(searchDocumentDto.getEndDate())))
-                );
-        */
-
-
         Page<Document> documents = documentRepository.findAll(documentSpecification, pageable);
         Page<DocumentDto> documentsDto = documents.map(documentMapper::entityToDto);
 
@@ -95,7 +83,7 @@ public class DocumentServiceImpl implements DocumentService {
 
 
     /**
-     @return Page со списком документов , удовлетворяющих полученным в параметрах условиям,
+     @return Page со списком документов, удовлетворяющих полученным в параметрах условиям,
      таким как : статус, автор, период дат создания, название документа, дата обновления, внутренний id
      */
     @Override
@@ -146,8 +134,6 @@ public class DocumentServiceImpl implements DocumentService {
         log.debug("endMethod, к возврату documentDto: {}", documentDto);
 
         return returnDocumentDto;
-
-//        return documentMapper.entityToDto(documentRepository.save(document));
     }
 
 
@@ -205,7 +191,7 @@ public class DocumentServiceImpl implements DocumentService {
 
 
     @Override
-    public PageResponseDto /* ApiResponse */ getByIdListWithNoFound(Pageable pageable, List<Long> idList) {
+    public PageResponseDto getByIdListWithNoFound(Pageable pageable, List<Long> idList) {
         log.debug("startMethod, idList: {}", idList);
 
         Specification documentSpecification = SpecificationUtils.in(Document_.ID, idList);
@@ -224,7 +210,7 @@ public class DocumentServiceImpl implements DocumentService {
 
 
     @Override
-    public /* Page<DocumentDto> */ DocumentPage getByIdListWithExtendedPage(Pageable pageable, List<Long> idList) {
+    public DocumentPage getByIdListWithExtendedPage(Pageable pageable, List<Long> idList) {
         log.debug("startMethod, idList: {}, pageable: {}", idList, pageable);
 
         Specification documentSpecification = SpecificationUtils.in(Document_.ID, idList);
@@ -272,7 +258,7 @@ public class DocumentServiceImpl implements DocumentService {
 
             } catch (Exception e) {
                 log.error("Ошибка при обработке документа c Id {}: {}", documentId, e.getMessage());
-                documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR));    // TODO Проверить нужный ли статус стоит
+                documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR));
             }
 
         }
@@ -308,7 +294,6 @@ public class DocumentServiceImpl implements DocumentService {
 
             if (updatedCount == 0) {
 
-                /** Статус мог измениться в другом потоке */
                 Status newStatus = documentRepository.findStatusById(documentId).orElse(Status.DRAFT);
 
                 log.warn("Конфликт при обновлении документа {}: {}", documentId, newStatus == Status.SUBMITTED ?
@@ -317,8 +302,6 @@ public class DocumentServiceImpl implements DocumentService {
                 return new DocumentSubmitResponseDto(documentId, OperationStatus.CONFLICT);
 
             } else {
-
-                /* Document documentForHistory = documentRepository.getReferenceById(documentId); */
 
                 Document document = documentRepository.findById(documentId)
                         .orElseThrow(() -> new RuntimeException("Документ после обновления не найден: " + documentId));
@@ -333,22 +316,20 @@ public class DocumentServiceImpl implements DocumentService {
                         .build();
 
                 historyRepository.save(history);
-                /** !Запись в историю */
 
 
                 log.info("Документ с Id: {} успешно обработан, статус изменен с DRAFT на SUBMITTED", documentId);
                 return new DocumentSubmitResponseDto(documentId, OperationStatus.SUCCESS);
 
             }
-            /** !Атомарное обновление статуса */
 
 
         } catch (DataAccessException e) {
             log.error("Ошибка базы данных при обработке документа {}: {}", documentId, e.getMessage());
-            return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);                                    /** Ошибка базы данных */
+            return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);
         } catch (Exception e) {
             log.error("Неожиданная ошибка при обработке документа {}: {}", documentId, e.getMessage(), e);
-            return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);                                    /** Неожиданная ошибка */
+            return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);
         }
 
     }
@@ -413,7 +394,7 @@ public class DocumentServiceImpl implements DocumentService {
 
                 int registerInserted = registerRepository.insertIfNotExists(documentId);
 
-                if (registerInserted == 0) {    /** Запись уже есть */
+                if (registerInserted == 0) {                                                                            /** Запись уже есть */
 
                     log.info("Конфликт при создании записи в Реестре для документа {}, запись уже существует", documentId);
 
@@ -454,14 +435,12 @@ public class DocumentServiceImpl implements DocumentService {
                                 .build();
 
                         historyRepository.save(history);
-                        /** !Запись в историю */
 
 
                         log.info("Документ с Id: {} успешно обработан, статус изменен с SUBMITTED на APPROVED", documentId);
                         return new DocumentSubmitResponseDto(documentId, OperationStatus.SUCCESS);
 
                     }
-                    /** !Обновление статуса */
 
                 }
 
@@ -472,18 +451,17 @@ public class DocumentServiceImpl implements DocumentService {
                 return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);
 
             }
-            /** !Запись в Реестр */
 
 
         } catch (DataAccessException e) {
             log.error("Ошибка базы данных при обработке документа {}: {}", documentId, e.getMessage());
-            return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);                           /** Ошибка базы данных */
+            return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);
         } catch (RegisterSaveException e) {
             log.error("Ошибка при сохранении документа {}: {}", documentId, e.getMessage(), e);
             return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);
         } catch (Exception e) {
             log.error("Ошибка при обработке документа {}: {}", documentId, e.getMessage(), e);
-            return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);                           /** Не ожидаемая ошибка */
+            return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);
         }
 
     }
@@ -523,7 +501,6 @@ public class DocumentServiceImpl implements DocumentService {
                 status.setRollbackOnly();
                 return new DocumentSubmitResponseDto(documentId, OperationStatus.CONFLICT);
             }
-            /** !Обновление статуса документа */
 
 
             /** Запись в историю: */
@@ -546,7 +523,6 @@ public class DocumentServiceImpl implements DocumentService {
                 status.setRollbackOnly();
                 return new DocumentSubmitResponseDto(documentId, OperationStatus.CONFLICT);
             }
-            /** !Запись в историю */
 
 
             /** Запись в реестр: */
@@ -566,7 +542,6 @@ public class DocumentServiceImpl implements DocumentService {
                 status.setRollbackOnly();
                 return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);
             }
-            /** !Запись в реестр */
 
 
             log.info("Конец транзакции для документа с Id: {}, документ успешно утверждён", documentId);
@@ -577,8 +552,9 @@ public class DocumentServiceImpl implements DocumentService {
 
 
     /** Approve одного документа в отдельной транзакции */
+    @Deprecated
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public DocumentSubmitResponseDto approveV1(Long documentId, String author, String comment) {
+    public DocumentSubmitResponseDto approveOld(Long documentId, String author, String comment) {
         log.debug("Начало обработки документа c Id: {}, author: {}, comment: {}", documentId, author, comment);
 
         try {
@@ -623,7 +599,6 @@ public class DocumentServiceImpl implements DocumentService {
                         .build();
 
                 historyRepository.save(history);
-                /** !Запись в историю */
 
 
                 /** Запись в Реестр: */
@@ -633,11 +608,9 @@ public class DocumentServiceImpl implements DocumentService {
                         .build();
 
                 Register saveRegister = registerRepository.save(register);
-                /** !Запись в Реестр */
 
 
                 if(saveRegister == null && saveRegister.getId() == null && saveRegister.getId() != documentId) {
-                    /** Вызываем откат транзакции : */
                     throw new RuntimeException("Ошибка сохранения в Реестре для документа с id: "
                             .concat(String.valueOf(documentId)));
                 }
@@ -646,143 +619,17 @@ public class DocumentServiceImpl implements DocumentService {
                 return new DocumentSubmitResponseDto(documentId, OperationStatus.SUCCESS);
 
             }
-            /** !Атомарное обновление статуса */
 
 
         } catch (DataAccessException e) {
             log.error("Ошибка базы данных при обработке документа {}: {}", documentId, e.getMessage());
-            return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);                           /** Ошибка базы данных */
+            return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);
         } catch (Exception e) {
             log.error("Неожиданная ошибка при обработке документа {}: {}", documentId, e.getMessage(), e);
-            return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);                           /** Не ожидаемая ошибка */
+            return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);
         }
 
     }
-    /** !Пакетная обработка Approve */
-
-
-
-    /***** APPROVES VARIANTS: ****/
-//    /**
-//     * Основной метод для пакетной обработки документов
-//     * Каждый документ обрабатывается атомарно в отдельной транзакции
-//     */
-//    @Transactional
-//    public List<DocumentProcessingResult> processDocuments(List<Integer> documentIds) {
-//        log.info("Начало обработки {} документов", documentIds.size());
-//
-//        List<DocumentProcessingResult> results = new ArrayList<>();
-//
-//        for (Integer docId : documentIds) {
-//            try {
-//                DocumentProcessingResult result = processSingleDocument(docId);
-//                results.add(result);
-//                log.debug("Документ {} обработан: {}", docId, result.getResult());
-//            } catch (Exception e) {
-//                log.error("Ошибка при обработке документа {}: {}", docId, e.getMessage(), e);
-//                results.add(DocumentProcessingResult.error(docId,
-//                        "Системная ошибка: " + e.getMessage()));
-//            }
-//        }
-//
-//        // Статистика обработки
-//        Map<DocumentProcessingResult.ResultStatus, Long> stats = results.stream()
-//                .collect(Collectors.groupingBy(DocumentProcessingResult::getResult, Collectors.counting()));
-//
-//        log.info("Обработка завершена. Статистика: {}", stats);
-//
-//        return results;
-//    }
-//
-//
-//    /**
-//     * Параллельная обработка с ограничением количества потоков
-//     */
-//    public List<DocumentProcessingResult> processDocumentsParallel(List<Integer> documentIds,
-//                                                                   int threadPoolSize) {
-//        log.info("Параллельная обработка {} документов в {} потоков",
-//                documentIds.size(), threadPoolSize);
-//
-//        ExecutorService executor = Executors.newFixedThreadPool(threadPoolSize);
-//        List<CompletableFuture<DocumentProcessingResult>> futures = new ArrayList<>();
-//
-//        try {
-//            for (Integer docId : documentIds) {
-//                CompletableFuture<DocumentProcessingResult> future =
-//                        CompletableFuture.supplyAsync(() -> processSingleDocument(docId), executor);
-//                futures.add(future);
-//            }
-//
-//            // Ожидаем завершения всех задач
-//            List<DocumentProcessingResult> results = futures.stream()
-//                    .map(CompletableFuture::join)
-//                    .collect(Collectors.toList());
-//
-//            log.info("Параллельная обработка завершена");
-//            return results;
-//
-//        } finally {
-//            executor.shutdown();
-//        }
-//    }
-//
-//    /**
-//     * Обработка с повторными попытками для конфликтных ситуаций
-//     */
-//    @Transactional
-//    public List<DocumentProcessingResult> processDocumentsWithRetry(List<Integer> documentIds,
-//                                                                    int maxRetries) {
-//        log.info("Обработка {} документов с повторными попытками (макс: {})",
-//                documentIds.size(), maxRetries);
-//
-//        Set<Integer> remainingIds = new HashSet<>(documentIds);
-//        List<DocumentProcessingResult> allResults = new ArrayList<>();
-//        int attempt = 1;
-//
-//        while (!remainingIds.isEmpty() && attempt <= maxRetries) {
-//            log.info("Попытка {}: обработка {} документов", attempt, remainingIds.size());
-//
-//            List<Integer> currentBatch = new ArrayList<>(remainingIds);
-//            List<DocumentProcessingResult> attemptResults = processDocuments(currentBatch);
-//
-//            allResults.addAll(attemptResults);
-//
-//            // Оставляем только конфликтные для повторной обработки
-//            remainingIds.clear();
-//            for (DocumentProcessingResult result : attemptResults) {
-//                if (result.getResult() == DocumentProcessingResult.ResultStatus.CONFLICT) {
-//                    remainingIds.add(result.getDocumentId());
-//                }
-//            }
-//
-//            if (!remainingIds.isEmpty()) {
-//                log.info("Конфликтных документов после попытки {}: {}",
-//                        attempt, remainingIds.size());
-//                try {
-//                    Thread.sleep(100); // Пауза перед повторной попыткой
-//                } catch (InterruptedException e) {
-//                    Thread.currentThread().interrupt();
-//                    break;
-//                }
-//            }
-//
-//            attempt++;
-//        }
-//
-//        return allResults;
-//    }
-//
-//    /**
-//     * Получение истории изменений для документов
-//     */
-//    @Transactional(readOnly = true)
-//    public Map<Integer, List<DocumentHistory>> getDocumentsHistory(List<Integer> documentIds) {
-//        List<DocumentHistory> historyList = historyRepository.findByDocumentIdInOrderByChangedAtDesc(documentIds);
-//        return historyList.stream()
-//                .collect(Collectors.groupingBy(DocumentHistory::getDocumentId));
-//    }
-    /***** !APPROVES VARIANTS ****/
-
 
 
     public List<Long> getNotExistingIds(List<Long> idList) {
@@ -822,153 +669,8 @@ public class DocumentServiceImpl implements DocumentService {
                 formattedDate
         );
 
-//        UUID namespace = UUID.fromString("00000000-0000-0000-0000-000000000001");
-
         log.debug("endMethod");
         return UUID.nameUUIDFromBytes(source.getBytes(StandardCharsets.UTF_8));
-    }
-
-
-    /** Устаревшие реализации далее */
-    /******************************************************************************************************************/
-
-
-    @Override
-    @Deprecated
-    public List<Document> findByStatusAuthorDate(Status status, Optional<String> author, Optional<ZonedDateTime> startDate, Optional<ZonedDateTime> endDate) {
-
-        List<Document> documents = new ArrayList<>(documentRepository.findByStatus(status));
-
-        author.ifPresent(s -> documents.retainAll(documentRepository.findByAuthor(s)));
-        startDate.ifPresent(zonedDateTime -> documents.retainAll(documentRepository.findByCreateDateAfter(zonedDateTime)));
-        endDate.ifPresent(zonedDateTime -> documents.retainAll(documentRepository.findByCreateDateBefore(zonedDateTime)));
-
-        return documents;
-    }
-
-
-    @Deprecated
-    @Transactional
-    public List<DocumentSubmitResponseDto> submitOld(Pageable pageable, List<Long> idList) {
-        log.debug("startMethod, idList: {}, pageable: {}", idList, pageable);
-
-        List<DocumentSubmitResponseDto> documentSubmitResponseDtoList = new ArrayList<>();
-
-
-        for (Long id: idList){
-
-            if (documentRepository.findById(id).isPresent()){
-
-                if (documentRepository.findById(id).get().getStatus() != Status.DRAFT){
-                    documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.CONFLICT));
-
-                } else {
-
-                    try {
-                        update(documentRepository.findById(id).get());
-                        documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.SUCCESS));
-                    } catch (Exception e){
-                        documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.REGISTER_ERROR));
-                    }
-
-                }
-
-            } else {
-                documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(id, OperationStatus.NOT_FOUND));
-            }
-
-        }
-
-
-        log.debug("endMethod, submitDocumentDtoList: {}", documentSubmitResponseDtoList);
-        return documentSubmitResponseDtoList;
-    }
-
-
-    @Override
-    @Deprecated
-    public DocumentDto entityToDto(Document document) {
-        return documentMapper.entityToDto(document);
-    }
-
-
-    @Override
-    @Deprecated
-    public List<DocumentDto> entitiesToDtos(List<Document> documents) {return documentMapper.entitiesToDtos(documents);}
-
-
-    @Override
-    @Transactional
-    public Document update(Document document) {
-
-        Document newDocument = documentRepository.findById(document.getId()).orElseThrow();
-
-        if (document.getCreateDate() != null) {
-            newDocument.setCreateDate(document.getCreateDate());
-        }
-
-        if (document.getAuthor() != null) {
-            newDocument.setAuthor(document.getAuthor());
-        }
-
-        newDocument.setStatus(Status.SUBMITTED);
-        if (document.getName() != null) {
-            newDocument.setName(document.getName());
-        }
-
-        Set<History> historySet = generateHistorySubmit(document);
-        //document.getHistorySet().clear();
-
-        newDocument.getHistorySet().addAll(historySet);
-        //historyRepository.saveAll(historySet);
-//        for (History history1 : historySet) {
-//            history1.setDocument(document);
-//        }
-
-        if (document.getInnerId() != null) {
-            newDocument.setInnerId(document.getInnerId());
-        }
-
-//        newDocument.setUpdateTime(ZonedDateTime.now());
-
-        documentRepository.save(newDocument);
-        return newDocument;
-    }
-
-
-    /** Вынести в Util GenerateDate */
-    private String generateAuthor(){
-        List<String> authors = List.of("Steven Spielberg", "Martin Scorsese", "Christopher Nolan", "Alfred Hitchcock",
-                "Stanley Kubrick");
-        Random rand = new Random();
-        int n = rand.nextInt(authors.size());
-        return authors.get(n);
-    }
-
-
-    /** Вынести в Util GenerateDate */
-    private String generateTitle(){
-        List<String> titles = List.of("Citizen Kane", "Casablanca", "The Godfather", "Gone with the Wind",
-                "Lawrence of Arabia", "The Wizard of Oz");
-        Random rand = new Random();
-        int n = rand.nextInt(titles.size());
-        return titles.get(n);
-    }
-
-
-    /** Вынести в Util GenerateDate */
-    @Transactional(propagation = Propagation.MANDATORY)
-    Set<History> generateHistorySubmit(Document document){
-        Set<History> histories = new HashSet<>();
-        History history = History.builder()
-                .action(Action.SUBMIT)
-                .date(ZonedDateTime.now())
-                .author(document.getAuthor())
-                .document(document)
-                .build();
-        histories.add(history);
-        historyRepository.saveAll(histories);
-        return histories;
     }
 
 }

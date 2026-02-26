@@ -4,13 +4,13 @@ import ru.kolivim.document.workflow.entity.enums.Status;
 import lombok.*;
 import jakarta.persistence.*;
 
+@Table(name = "register", schema = "doc_workflow")
 @Entity
 @Setter
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "register", schema = "doc_workflow")
 public class Register {
 
     @Id
