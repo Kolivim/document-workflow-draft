@@ -16,15 +16,14 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
-
-#    show-sql:true
+#    show-sql:false
 
   liquibase:
     default-schema: public
     liquibase-schema: public
 #    default-schema: doc_workflow
     change-log: classpath:/db/migration/database-doc.workflow-changelog-master.xml
-#    change-log: classpath:/db/migration/database-doc.workflow-changelog-master.yaml
+    enabled: true
 
 
 
@@ -36,12 +35,13 @@ app:
     approve:
       fixed-delay: 100000
 
-#generator:
-#  number: 15
-#  fixed-delay: 100000
-
-#batch-size: 10
-#fixed-delay: 600000
-
 api:
   base-url: http://localhost:8080/api/v1/document
+
+logging:
+  level:
+    ru.kolivim.document.workflowl: DEBUG
+    org:
+      springframework: DEBUG
+  file:
+    name: logs/log

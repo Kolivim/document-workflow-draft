@@ -125,13 +125,13 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     public DocumentDto create(DocumentDto documentDto) {
-        log.debug("startMethod, documentDto: {}", documentDto);
+        log.info("startMethod, documentDto: {}", documentDto);
 
         Document document = documentMapper.dtoToNewEntity(documentDto);
 
         DocumentDto returnDocumentDto = documentMapper.entityToDto(documentRepository.save(document));
 
-        log.debug("endMethod, к возврату documentDto: {}", documentDto);
+        log.info("endMethod, к возврату documentDto: {}", documentDto);
 
         return returnDocumentDto;
     }
@@ -139,35 +139,35 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public Document getDocumentById(Long id) {
-        log.debug("startMethod, id: {}", id);
+        log.info("startMethod, id: {}", id);
         return documentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
     }
 
 
     @Override
     public Optional<Document> getDocumentOptionalById(Long id) {
-        log.debug("startMethod, id: {}", id);
+        log.info("startMethod, id: {}", id);
         return documentRepository.findById(id);
     }
 
 
     @Override
     public Optional<Status> getStatusOptionalById(Long id) {
-        log.debug("startMethod, id: {}", id);
+        log.info("startMethod, id: {}", id);
         return documentRepository.findStatusById(id);
     }
 
 
     @Override
     public long registerCountByDocumentId(Long documentId) {
-        log.debug("startMethod, documentId: {}", documentId);
+        log.info("startMethod, documentId: {}", documentId);
         return registerRepository.countByDocumentId(documentId);
     }
 
 
     @Override
     public DocumentDto getById(Long id) {
-        log.debug("startMethod, id: {}", id);
+        log.info("startMethod, id: {}", id);
 
         Document document = documentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
 
@@ -179,20 +179,20 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public Page<DocumentDto> getByIdList(Pageable pageable, List<Long> idList) {
-        log.debug("startMethod, idList: {}", idList);
+        log.info("startMethod, idList: {}", idList);
 
         Specification documentSpecification = SpecificationUtils.in(Document_.ID, idList);
         Page<Document> documents = documentRepository.findAll(documentSpecification, pageable);
         Page<DocumentDto> documentsDto = documents.map(documentMapper::entityToDto);
 
-        log.debug("endMethod, Page documentsDto: {}", documentsDto);
+        log.info("endMethod, Page documentsDto: {}", documentsDto);
         return documentsDto;
     }
 
 
     @Override
     public PageResponseDto getByIdListWithNoFound(Pageable pageable, List<Long> idList) {
-        log.debug("startMethod, idList: {}", idList);
+        log.info("startMethod, idList: {}", idList);
 
         Specification documentSpecification = SpecificationUtils.in(Document_.ID, idList);
 
@@ -204,14 +204,14 @@ public class DocumentServiceImpl implements DocumentService {
         PageResponseDto pageResponseDto = new PageResponseDto(documentsDto, notExistingIdList,
                 notExistingIdList.size(), idList.size());
 
-        log.debug("endMethod, к возврату pageResponse: {}", pageResponseDto);
+        log.info("endMethod, к возврату pageResponse: {}", pageResponseDto);
         return pageResponseDto;
     }
 
 
     @Override
     public DocumentPage getByIdListWithExtendedPage(Pageable pageable, List<Long> idList) {
-        log.debug("startMethod, idList: {}, pageable: {}", idList, pageable);
+        log.info("startMethod, idList: {}, pageable: {}", idList, pageable);
 
         Specification documentSpecification = SpecificationUtils.in(Document_.ID, idList);
 
@@ -220,7 +220,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         List<Long> notExistingIdList = getNotExistingIds(idList);
 
-        log.debug("endMethod, Page<DocumentDto> documentsDto: {}", documentsDto);
+        log.info("endMethod, Page<DocumentDto> documentsDto: {}", documentsDto);
 
         return new DocumentPage<>(
                 documentsDto.getContent(),
@@ -235,36 +235,46 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentSubmitResponseDto> submit(Pageable pageable, DocumentsRequestDto documentsRequestDto) {
-        log.debug("startMethod, documentsRequestDto: {}, pageable: {}", documentsRequestDto, pageable);
+        log.info("startMethod, documentsRequestDto: {}, pageable: {}", documentsRequestDto, pageable);
         return submit(pageable, documentsRequestDto.getIds(), documentsRequestDto.getAuthor(), documentsRequestDto.getComment());
     }
 
 
     @Transactional
     public List<DocumentSubmitResponseDto> submit(Pageable pageable, List<Long> idList, String author, String comment) {
-        log.debug("startMethod, размер полученного списка: {}, documentsRequestDto: {}, author: {}, comment:{}, pageable: {}",
+        log.info("startMethod, начало отправки на утверждение (SUBMITTED) полученного списка размером: {}, " +
+                        "documentsRequestDto: {}, author: {}, comment:{}, pageable: {}",
                 idList != null ? idList.size() : "NULL", idList, author, comment, pageable);
 
         List<DocumentSubmitResponseDto> documentSubmitResponseDtoList = new ArrayList<>();
 
 
-        for (Long documentId : idList) {
+        for (int i = 1; i <= idList.size(); i++) {
+
+            Long documentId = idList.get(i-1);
 
             try {
 
                 DocumentSubmitResponseDto result = submit(documentId, author, comment);
                 documentSubmitResponseDtoList.add(result);
-                log.debug("Документ {} обработан со статусом: {}", documentId, result.getOperationStatus());
+
+                log.info("Документ {} из {}, с Id: {} отправлен на утверждение (перевод в статус SUBMITTED) со статусом" +
+                                "операции OperationStatus: {}",
+                        i, idList.size(), documentId, result.getOperationStatus());
+
 
             } catch (Exception e) {
-                log.error("Ошибка при обработке документа c Id {}: {}", documentId, e.getMessage());
-                documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR));
+                log.error("Ошибка при обработке документа {} из {}, с Id {}: {}",
+                        i, idList.size(), documentId, e.getMessage());
+                documentSubmitResponseDtoList.add(new DocumentSubmitResponseDto(documentId,
+                        OperationStatus.REGISTER_ERROR));
             }
 
         }
 
 
-        log.debug("endMethod, submitDocumentDtoList: {}", documentSubmitResponseDtoList);
+        log.info("endMethod, завершена отправка на утверждение (SUBMITTED) полученного списка размером: {}, " +
+                "submitDocumentDtoList: {}", idList != null ? idList.size() : "NULL", documentSubmitResponseDtoList);
         return documentSubmitResponseDtoList;
     }
 
@@ -272,14 +282,14 @@ public class DocumentServiceImpl implements DocumentService {
     /** Обработка одного документа в отдельной транзакции */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public DocumentSubmitResponseDto submit(Long documentId, String author, String comment) {
-        log.debug("Начало обработки документа c Id: {}, author: {}, comment: {}", documentId, author, comment);
+        log.info("Начало обработки документа c Id: {}, author: {}, comment: {}", documentId, author, comment);
 
         try {
 
             boolean isDocumentExist = documentRepository.existsById(documentId);
 
             if (!isDocumentExist) {
-                log.debug("Документ c Id: {} не найден", documentId);
+                log.info("Документ c Id: {} не найден", documentId);
                 return new DocumentSubmitResponseDto(documentId, OperationStatus.NOT_FOUND);
             }
 
@@ -338,30 +348,35 @@ public class DocumentServiceImpl implements DocumentService {
     /** Пакетная обработка Approve: */
     @Override
     public List<DocumentSubmitResponseDto> approve(Pageable pageable, DocumentsRequestDto documentsRequestDto) {
-        log.debug("startMethod, documentsRequestDto: {}, pageable: {}", documentsRequestDto, pageable);
+        log.info("startMethod, documentsRequestDto: {}, pageable: {}", documentsRequestDto, pageable);
         return approve(pageable, documentsRequestDto.getIds(), documentsRequestDto.getAuthor(), documentsRequestDto.getComment());
     }
 
 
     @Transactional
     public List<DocumentSubmitResponseDto> approve(Pageable pageable, List<Long> idList, String author, String comment) {
-        log.debug("startMethod, размер полученного списка: {}, documentsRequestDto: {}, author: {}, comment:{}, pageable: {}",
-                idList != null ? idList.size() : "NULL", idList, author, comment, pageable);
+        log.info("startMethod, начало утверждения (APPROVED) полученного списка размером: {}, documentsRequestDto: {}, " +
+                        "author: {}, comment:{}, pageable: {}", idList != null ? idList.size() : "NULL",
+                        idList, author, comment, pageable);
 
         List<DocumentSubmitResponseDto> documentSubmitResponseDtoList = new ArrayList<>();
 
 
-        for (Long documentId : idList) {
+        for (int i = 1; i <= idList.size(); i++) {
+
+            Long documentId = idList.get(i-1);
 
             DocumentSubmitResponseDto result = approveWithRollback(documentId, author, comment);
             documentSubmitResponseDtoList.add(result);
 
-            log.info("Документ с Id: {} обработан со статусом: {}", documentId, result.getOperationStatus());
+            log.info("Документ {} из {}, с Id: {} утверждение (перевод в статус APPROVE) завершено со статусом " +
+                    "операции OperationStatus: {}", i, idList.size(), documentId, result.getOperationStatus());
 
         }
 
 
-        log.debug("endMethod, submitDocumentDtoList: {}", documentSubmitResponseDtoList);
+        log.info("endMethod, завершено утверждение (APPROVED) полученного списка размером: {}, к возврату " +
+                "submitDocumentDtoList: {}", idList != null ? idList.size() : "NULL", documentSubmitResponseDtoList);
         return documentSubmitResponseDtoList;
     }
 
@@ -369,7 +384,7 @@ public class DocumentServiceImpl implements DocumentService {
     /** Approve одного документа в отдельной транзакции */
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = {RegisterSaveException.class, RuntimeException.class})
     public DocumentSubmitResponseDto approve(Long documentId, String author, String comment) /* throws RegisterSaveException */ {
-        log.debug("Начало обработки документа c Id: {}, author: {}, comment: {}", documentId, author, comment);
+        log.info("Начало обработки документа c Id: {}, author: {}, comment: {}", documentId, author, comment);
 
 
         try {
@@ -472,11 +487,11 @@ public class DocumentServiceImpl implements DocumentService {
             rollbackFor = {RegisterSaveException.class, RuntimeException.class})
     public DocumentSubmitResponseDto approveWithRollback(Long documentId, String author, String comment) {
 
-        log.debug("Начало обработки документа c Id: {}, author: {}, comment: {}", documentId, author, comment);
+        log.info("Начало обработки документа c Id: {}, author: {}, comment: {}", documentId, author, comment);
 
         return transactionTemplate.execute(status -> {
 
-            log.debug("Начало транзакции для обработки документа c Id: {}, author: {}, comment: {}",
+            log.info("Начало транзакции для обработки документа c Id: {}, author: {}, comment: {}",
                     documentId, author, comment);
 
 
@@ -555,7 +570,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Deprecated
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public DocumentSubmitResponseDto approveOld(Long documentId, String author, String comment) {
-        log.debug("Начало обработки документа c Id: {}, author: {}, comment: {}", documentId, author, comment);
+        log.info("Начало обработки документа c Id: {}, author: {}, comment: {}", documentId, author, comment);
 
         try {
 
@@ -633,7 +648,7 @@ public class DocumentServiceImpl implements DocumentService {
 
 
     public List<Long> getNotExistingIds(List<Long> idList) {
-        log.debug("startMethod, idList: {}", idList);
+        log.info("startMethod, idList: {}", idList);
 
         List<Long> existingIdInList = documentRepository.findAllExistingIds(idList);
         Set<Long> existingIdSet = new HashSet<>(existingIdInList);
@@ -642,23 +657,23 @@ public class DocumentServiceImpl implements DocumentService {
                 .filter(id -> !existingIdSet.contains(id))
                 .collect(Collectors.toList());
 
-        log.debug("endMethod, notExistingIdInList: {}", notExistingIdInList);
+        log.info("endMethod, notExistingIdInList: {}", notExistingIdInList);
         return notExistingIdInList;
     }
 
 
     public List<Document> getByStatus(Status status, PageRequest pageRequest) {
-        log.debug("startMethod, status: {}", status);
+        log.info("startMethod, status: {}", status);
 
         List<Document> documents = documentRepository.findDocumentsByStatus(status, pageRequest);
 
-        log.debug("endMethod, к возврату documents: {} для status : {}", documents, status);
+        log.info("endMethod, к возврату documents: {} для status : {}", documents, status);
         return documents;
     }
 
 
     public static UUID generateInnerId(String author, String name, ZonedDateTime date) {
-        log.debug("startMethod, author: {}, name: {}, date: {}", author, name, date);
+        log.info("startMethod, author: {}, name: {}, date: {}", author, name, date);
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
         String formattedDate = date.format(formatter);
@@ -669,7 +684,7 @@ public class DocumentServiceImpl implements DocumentService {
                 formattedDate
         );
 
-        log.debug("endMethod");
+        log.info("endMethod");
         return UUID.nameUUIDFromBytes(source.getBytes(StandardCharsets.UTF_8));
     }
 

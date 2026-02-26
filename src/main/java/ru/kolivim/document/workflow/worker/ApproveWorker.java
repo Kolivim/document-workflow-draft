@@ -29,7 +29,7 @@ public class ApproveWorker {
     @Async("taskExecutor")
     @Scheduled(fixedDelayString = "${app.batch.approve.fixed-delay}")
     public void processApproveBatch() {
-        log.debug("startMethod");
+        log.info("startMethod");
 
         long startTime = System.currentTimeMillis();
 
@@ -44,7 +44,7 @@ public class ApproveWorker {
             log.error("CATCH в ApproveWorker, e: {}", e.getMessage());
         }
 
-        log.debug("endMethod");
+        log.info("endMethod");
     }
 
 }

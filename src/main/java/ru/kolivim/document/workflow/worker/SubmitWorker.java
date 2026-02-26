@@ -25,7 +25,7 @@ public class SubmitWorker {
     @Async("taskExecutor")
     @Scheduled(fixedDelayString = "${app.batch.approve.fixed-delay}")
     public void processSubmitBatch() {
-        log.debug("startMethod");
+        log.info("startMethod");
 
         long startTime = System.currentTimeMillis();
 
@@ -34,13 +34,13 @@ public class SubmitWorker {
             int processedCount = processingService.processSubmitBatch(batchConfig.getSize());
             long duration = System.currentTimeMillis() - startTime;
 
-            log.debug("Отправлено на SUBMIT {} документов за {} мс", processedCount, duration);
+            log.info("Отправлено на SUBMIT {} документов за {} мс", processedCount, duration);
 
         } catch (Exception e) {
             log.error("CATCH в SubmitWorker, e: {}", e.getMessage());
         }
 
-        log.debug("endMethod");
+        log.info("endMethod");
     }
 
 }

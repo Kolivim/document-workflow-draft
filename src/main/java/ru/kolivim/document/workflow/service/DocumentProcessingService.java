@@ -67,6 +67,15 @@ public class DocumentProcessingService {
 
         }
 
+        if (response.getProcessedIds() != null && response.getFailedIds() != null) {
+            int processed = response.getProcessedIds().size();
+            int failed = response.getFailedIds().size();
+            int total = processed + failed;
+
+            log.info("Завершена отправка пачки документов на утверждение (SUBMITTED), в которой всего {} документов, " +
+                    "из них успешно обработано {}, осталось/ошибок {}", total, processed, failed);
+        }
+
         return response.getProcessedIds() != null ? response.getProcessedIds().size() : 0;
     }
 
@@ -94,14 +103,23 @@ public class DocumentProcessingService {
 
         if (response.isSuccess() && response.getProcessedIds() != null) {
             log.info("Успешно отправлено на утверждение (Approve) {} документов, " +
-                            "статус Approve присвоен документам с Id: {}",
+                            "статус Approve успешно присвоен документам с Id: {}",
                     response.getProcessedIds().size(), response.getProcessedIds());
         }
 
         if (response.getFailedIds() != null && !response.getFailedIds().isEmpty()) {
-            log.info("PЗавершилась ошибкой отправка на утверждение (Approve) {} документов, " +
+            log.info("Завершилась ошибкой отправка на утверждение (Approve) {} документов, " +
                             "статус Approve не присвоен документам с Id: {}",
                     response.getFailedIds().size(), response.getFailedIds());
+        }
+
+        if (response.getProcessedIds() != null && response.getFailedIds() != null) {
+            int processed = response.getProcessedIds().size();
+            int failed = response.getFailedIds().size();
+            int total = processed + failed;
+
+            log.info("Завершена обработка пачки документов на утверждение (APPROVE), в которой всего {} документов, " +
+                            "из них успешно обработано {}, осталось/ошибок {}", total, processed, failed);
         }
 
 

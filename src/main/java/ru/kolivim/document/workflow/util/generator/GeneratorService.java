@@ -59,17 +59,19 @@ public class GeneratorService {
 
         this.totalDocuments = properties.getTotalDocuments();
 
-        log.info("Получено для создания следующее количество документов: {}", totalDocuments);
+        log.info("Получено для создания из конфигурационного файла следующее количество документов, : {}", totalDocuments);
 
     }
 
 
     /** Запускает процесс создания документов */
     public void generate() {
-        log.info("startMethod");
+        log.info("startMethod, получено для создания следующее количество документов: {}", totalDocuments);
 
         startTime = System.currentTimeMillis();
         lastLogTime = startTime;
+
+        printLoadedConfigParameters();
 
 
         /** Создаём указанное количество пачек */
@@ -109,7 +111,10 @@ public class GeneratorService {
     /** Создает один документ через API */
     private void createSingleDocument(int index, int total) {
 
-        log.info("startMethod, документ {} из {}", index, total);
+        long docStartTime = System.currentTimeMillis();
+
+        log.info("startMethod, подготовка создания документа {} из {}", index, total);
+
 
         try {
 
@@ -133,7 +138,22 @@ public class GeneratorService {
                 createdIds.add(response.getBody().getId());
                 successCount.incrementAndGet();
 
-                log.info("Создан Документ {}/{} - ID: {}", index, total, response.getBody().getId());
+                log.info("Создан Документ {}/{} - с Id: {} за {} мс", index, total, response.getBody().getId(),
+                        System.currentTimeMillis() - docStartTime);
+
+                if (index % 10 == 0 || index == total) {
+
+                    long now = System.currentTimeMillis();
+                    long elapsed = now - startTime;
+                    double avgTimePerDoc = (double) elapsed / index;
+                    long remainingTime = (long) (avgTimePerDoc * (total - index));
+
+                    int percent = (index * 100) / total;
+                    log.info("Прогресс: для документа {} из {} составляет {}% | Прошло: {} мс | " +
+                                    "Прогнозируемое оставшееся время ~ {} мс",
+                            index, total, percent, elapsed, remainingTime);
+
+                }
 
             }
 
@@ -144,6 +164,12 @@ public class GeneratorService {
 
 
         log.info("endMethod, отправлен запрос на создание документа {} из {}", index, total);
+    }
+
+
+    public void updateTotalDocuments(int total) {
+        this.totalDocuments = total;
+        log.info("Обновлено общее количество документов для создания: {}", totalDocuments);
     }
 
 
@@ -178,7 +204,7 @@ public class GeneratorService {
         int total = successCount.get() + failureCount.get();
         if (total > 0) {
             double percent = (successCount.get() * 100.0) / total;
-            log.info("📊 Процент успеха: {:.1f}%", percent);
+            log.info("Процент успеха: {} %", percent);
         }
 
         log.info("");
@@ -197,11 +223,31 @@ public class GeneratorService {
         }
 
         log.info("");
-        log.info("💾 Всего создано документов: {}", createdIds.size());
+        log.info("Всего создано документов: {}", createdIds.size());
         log.info("");
 
+        if (successCount.get() > 0) {
+            double avgTime = (double) duration / successCount.get();
+            log.info("Среднее время на документ: {} мс", Math.round(avgTime));
+        }
 
         log.info("endMethod");
+    }
+
+
+    private void printLoadedConfigParameters() {
+
+        log.info("");
+        log.info("╔══════════════════════════════════════════════════════════════╗");
+        log.info("║         УТИЛИТА МАССОВОГО СОЗДАНИЯ ДОКУМЕНТОВ                ║");
+        log.info("╚══════════════════════════════════════════════════════════════╝");
+        log.info("\tПолучены следующие параметры генерации Документов:");
+        log.info("\t📊 Количество пачек для создания: {} (по умолчанию = 1)", properties.getCount());
+        log.info("\t📦 Количество документов для создания, в 1 пачке: {}", properties.getNumber());
+        log.info("\t👤 Автор: {}", properties.getAuthor());
+        log.info("\t📌 Статус: {}", properties.getStatus());
+        log.info("\t🌐 API URL: {}\n", properties.getApiUrl());
+
     }
 
 }

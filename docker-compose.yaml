@@ -1,34 +1,24 @@
+version: '3.8'
+
 services:
-  db:
-    image: postgres:15-alpine
-    container_name: postgres_container
+  postgres:
+    image: postgres:17.6
+    container_name: doc_workflow_db
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydatabase
+      POSTGRES_DB: doc_workflow
+      POSTGRES_USER: docWf
+      POSTGRES_PASSWORD: docWf
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks:
-      - app-network
+      - postgres_data:/var/lib/postgresql/data
     restart: always
-
-  app:
-    build: . # Предполагается, что Dockerfile есть рядом
-    container_name: java_app
-    depends_on:
-      - db
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mydatabase
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docWf -d doc_workflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
-  pgdata:
+  postgres_data:
+    name: doc_workflow_data

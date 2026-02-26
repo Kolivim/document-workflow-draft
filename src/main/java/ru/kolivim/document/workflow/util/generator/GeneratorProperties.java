@@ -34,7 +34,7 @@ public class GeneratorProperties {
 
     /** Загружает параметры из файла по умолчанию */
     public void loadFromDefaultFile() throws IOException {
-        log.error("startMethod");
+        log.info("startMethod");
 
         Properties props = new Properties();
 
@@ -89,8 +89,7 @@ public class GeneratorProperties {
         }
 
 
-        printLoadedConfigParameters();
-        log.error("endMethod");
+        log.info("endMethod");
     }
 
 
