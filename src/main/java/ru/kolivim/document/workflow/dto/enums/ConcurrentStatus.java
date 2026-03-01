@@ -2,8 +2,7 @@ package ru.kolivim.document.workflow.dto.enums;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "Статус операции при конкурентной процедуре утверждения",
-        allowableValues = {"SUCCESS", "CONFLICT", "ERROR"})
+@Schema(description = "Статус операции при конкурентной процедуре утверждения")
 public enum ConcurrentStatus {
 
     @Schema(description = "Операция выполнена успешно")

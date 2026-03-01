@@ -26,7 +26,14 @@ spring:
     change-log: classpath:/db/migration/database-doc.workflow-changelog-master.xml
     enabled: true
 
-
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  show-actuator: false
 
 app:
   batch:

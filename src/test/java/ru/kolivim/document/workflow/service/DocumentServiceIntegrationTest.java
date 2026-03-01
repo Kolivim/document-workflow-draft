@@ -35,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
-@Deprecated
 @Testcontainers
 @SpringBootTest
 @AutoConfigureMockMvc

@@ -190,8 +190,45 @@ Happy-path: создание, submit, approve одного документа
 
 
 ## Swagger UI 
-Документация API доступна по адресу:
-http://localhost:8080/swagger-ui/index.html#
+
+### Документация API доступна по адресу:
+
+Документация доступна по адресу:
+
+http://localhost:8080/swagger-ui/index.html
+
+Прямая ссылка на OpenAPI спецификацию:
+- **YAML**: http://localhost:8080/api-docs.yaml
+- **JSON**: http://localhost:8080/api-docs
+
+#### Генерация OpenAPI спецификации выполните:
+
+##### Автоматическая генерация (во время сборки Maven)
+
+```bash
+# Полная сборка с генерацией OpenAPI
+mvn clean verify
+
+# После выполнения файл будет доступен:
+./target/openapi.yaml
+```
+
+### OpenAPI спецификация
+
+Сгенерированный файл `openapi.yaml` содержит полное описание REST API:
+
+- Эндпоинты (документы, submit, approve, concurrent)
+
+- Модели данных (DTO, enum)
+
+- Примеры запросов и ответов
+
+- Коды ошибок
+
+
+### Поиск по датам:
+В эндпоинтах фильтрации (`/filter`, `/advancedFilter`) поиск осуществляется по полю **`createDate`** 
+(дата создания документа).
 
 
 ## Масштабирование и опциональные улучшения

@@ -84,7 +84,8 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
             <version>${testcontainers.version}</version>
-            <scope>version</scope>
+            <scope>test</scope>
+<!--            <scope>version</scope>-->
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.projectlombok</groupId>-->
@@ -149,6 +150,52 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+
+            <!-- Плагин Spring Boot для управления жизненным циклом приложения -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+<!--                <version>${spring-boot.version}</version> &lt;!&ndash; Убедитесь, что версия указана &ndash;&gt;-->
+                <configuration>
+                    <jvmArguments>-Dspring.application.admin.enabled=true</jvmArguments>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>pre-integration-test</id>
+                        <goals>
+                            <goal>start</goal> <!-- Запустить приложение -->
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-integration-test</id>
+                        <goals>
+                            <goal>stop</goal> <!-- Остановить приложение -->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Плагин Springdoc для генерации OpenAPI спецификации -->
+            <plugin>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                <version>1.5</version> <!-- ИСПРАВЛЕНО -->
+                <executions>
+                    <execution>
+                        <phase>integration-test</phase> <!-- Выполнить на этой фазе -->
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <apiDocsUrl>http://localhost:8080/api-docs</apiDocsUrl>
+                    <outputFileName>openapi.yaml</outputFileName>
+                    <outputDir>${project.build.directory}</outputDir>
+                    <!-- Параметры connectTimeout и readTimeout УДАЛЕНЫ -->
+                </configuration>
+            </plugin>
+
         </plugins>
         <testResources>
             <testResource>

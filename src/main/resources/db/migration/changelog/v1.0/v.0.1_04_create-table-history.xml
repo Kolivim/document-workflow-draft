@@ -12,15 +12,6 @@
             </not>
         </preConditions>
 
-<!--        <setColumnRemarks -->
-<!--                catalogName="appledb" -->
-<!--                          columnName="apple_name" -->
-<!--                          remarks="column will store the name of the apples" -->
-<!--                          schemaName="appledb" -->
-<!--                          tableName="apple" -->
-<!--                          columnDataType="VARCHAR(20)"-->
-<!--        />-->
-
         <createTable tableName="history" schemaName="doc_workflow">
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true"/>

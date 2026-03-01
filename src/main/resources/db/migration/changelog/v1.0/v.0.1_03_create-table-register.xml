@@ -22,15 +22,6 @@
             </column>
         </createTable>
 
-<!--        <addForeignKeyConstraint-->
-<!--                baseColumnNames="id"-->
-<!--                baseTableName="register"-->
-<!--                baseTableSchemaName="doc_workflow"-->
-<!--                constraintName="fk_register_id"-->
-<!--                referencedColumnNames="id"-->
-<!--                referencedTableName="documents"-->
-<!--                referencedTableSchemaName="doc_workflow"/>-->
-
     </changeSet>
 
 </databaseChangeLog>
