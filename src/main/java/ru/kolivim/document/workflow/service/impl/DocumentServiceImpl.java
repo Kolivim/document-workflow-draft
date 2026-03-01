@@ -182,6 +182,9 @@ public class DocumentServiceImpl implements DocumentService {
     public Page<DocumentDto> getByIdList(Pageable pageable, List<Long> idList) {
         log.info("startMethod, idList: {}", idList);
 
+         if (idList == null) return Page.empty(pageable);
+
+
         Specification documentSpecification = SpecificationUtils.in(Document_.ID, idList);
         Page<Document> documents = documentRepository.findAll(documentSpecification, pageable);
         Page<DocumentDto> documentsDto = documents.map(documentMapper::entityToDto);

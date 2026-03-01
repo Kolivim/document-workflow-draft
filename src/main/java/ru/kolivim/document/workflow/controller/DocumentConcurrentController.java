@@ -47,14 +47,14 @@ public class DocumentConcurrentController {
                             schema = @Schema(implementation = ConcurrentResponseDto.class),
                             examples = @ExampleObject(
                                     value = """
-                        {
-                            "id": 1,
-                            "status": "APPROVED",
-                            "countSuccessfulApprove": 1,
-                            "countFailedApprove": 49,
-                            "isSuccess": true
-                        }
-                        """
+                                            {
+                                                "id": 1,
+                                                "status": "APPROVED",
+                                                "countSuccessfulApprove": 1,
+                                                "countFailedApprove": 49,
+                                                "isSuccess": true
+                                            }
+                                            """
                             )
                     )
             ),
@@ -89,14 +89,14 @@ public class DocumentConcurrentController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
                                     value = """
-                        {
-                            "code": "NOT_FOUND",
-                            "message": "Документ не найден для id: 10250",
-                            "status": 404,
-                            "timestamp": "2026-03-01T22:03:44.8463934+03:00",
-                            "path": "/api/v1/document/concurrent"
-                        }
-                        """
+                                            {
+                                                "code": "NOT_FOUND",
+                                                "message": "Документ не найден для id: 10250",
+                                                "status": 404,
+                                                "timestamp": "2026-03-01T22:03:44.8463934+03:00",
+                                                "path": "/api/v1/document/concurrent"
+                                            }
+                                            """
                             )
                     )
             ),
@@ -108,14 +108,14 @@ public class DocumentConcurrentController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(
                                     value = """
-                        {
-                            "code": "INVALID_STATUS_TRANSITION",
-                            "message": "Недопустимый переход статуса для документа 1025: APPROVED -> APPROVED",
-                            "status": 409,
-                            "timestamp": "2026-03-01T22:03:32.0283642+03:00",
-                            "path": "/api/v1/document/concurrent"
-                        }
-                        """
+                                            {
+                                                "code": "INVALID_STATUS_TRANSITION",
+                                                "message": "Недопустимый переход статуса для документа 1025: APPROVED -> APPROVED",
+                                                "status": 409,
+                                                "timestamp": "2026-03-01T22:03:32.0283642+03:00",
+                                                "path": "/api/v1/document/concurrent"
+                                            }
+                                            """
                             )
                     )
             )
