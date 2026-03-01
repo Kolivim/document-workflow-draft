@@ -19,7 +19,6 @@ import ru.kolivim.document.workflow.dto.request.DocumentsRequestDto;
 import ru.kolivim.document.workflow.dto.response.DocumentSubmitResponseDto;
 import ru.kolivim.document.workflow.entity.Document;
 import ru.kolivim.document.workflow.entity.History;
-import ru.kolivim.document.workflow.entity.Register;
 import ru.kolivim.document.workflow.entity.enums.Action;
 import ru.kolivim.document.workflow.entity.enums.OperationStatus;
 import ru.kolivim.document.workflow.entity.enums.Status;
@@ -179,10 +178,6 @@ public class DocumentBatchSubmitTest {
     @DisplayName("Пакетный submit - различные результаты в пределах одного пакета (успех, конфликт, не найдено)")
     void batchSubmitDifferentDocumentStage() {
         log.info("startMethod");
-
-//        ZonedDateTime submittedDateTime = ZonedDateTime.now(ZoneOffset.UTC);
-//        LocalDate startLocalDate = submittedDateTime.toLocalDate();
-
 
         /** Подготавливаем документы, во всех имеющихся статусах */
         List<Long> documentIds = createDocuments(30);

@@ -13,6 +13,8 @@ import ru.kolivim.document.workflow.dto.response.DocumentSubmitResponseDto;
 import ru.kolivim.document.workflow.entity.Document;
 import ru.kolivim.document.workflow.entity.enums.OperationStatus;
 import ru.kolivim.document.workflow.entity.enums.Status;
+import ru.kolivim.document.workflow.exception.InvalidStatusTransitionException;
+import ru.kolivim.document.workflow.exception.ResourceNotFoundException;
 import ru.kolivim.document.workflow.service.DocumentConcurrentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,7 +42,7 @@ public class DocumentConcurrentServiceImpl implements DocumentConcurrentService 
 
 
         Document document = getCorrectDocument(request.getDocumentId());
-        if(document == null) return ConcurrentResponseDto.builder().isSuccess(false).build();
+//        if(document == null) return ConcurrentResponseDto.builder().isSuccess(false).build();
 
 
         ExecutorService executor = Executors.newFixedThreadPool(request.getThreads());
@@ -281,14 +283,16 @@ public class DocumentConcurrentServiceImpl implements DocumentConcurrentService 
         Optional<Document> documentOptional = documentService.getDocumentOptionalById(documentId);
         if(!documentOptional.isPresent()) {
             log.info("Не найден документ с documentId: {}", documentId);
-            return null /** Написать далее реализацию ответа - Документ не найден */ ;
+            throw new ResourceNotFoundException("Документ не найден для id: ".concat(documentId.toString()));
+//            return null /** Написать далее реализацию ответа - Документ не найден */ ;
         }
 
         Document document = documentOptional.get();
 
-        if (document.getStatus() != Status.SUBMITTED.SUBMITTED) {
+        if (document.getStatus() != Status.SUBMITTED/*.SUBMITTED*/) {
             log.info("Не корректный статус документа с documentId: {}", documentId);
-            return null;
+            throw new InvalidStatusTransitionException(documentId, document.getStatus(), Status.APPROVED);
+//            return null;
         }
 
         log.debug("endMethod, к возврату document: {}", document);

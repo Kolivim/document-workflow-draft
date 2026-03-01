@@ -35,14 +35,12 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@Deprecated
 @ExtendWith(MockitoExtension.class)
 class DocumentServiceImplTest {
 
@@ -146,14 +144,14 @@ class DocumentServiceImplTest {
 
     @Test
     @DisplayName("Получение документа по ID - документ не найден")
-    void getByIdShouldThrowExceptionWhenDocumentNotFound() {
+    void getByIdWithThrowExceptionWhenDocumentNotFound() {
 
         when(documentRepository.findById(TEST_DOCUMENT_ID)).thenReturn(Optional.empty());
 
 
         assertThatThrownBy(() -> documentService.getById(TEST_DOCUMENT_ID))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Document not found");
+                .hasMessage("Документ не найден для id: ".concat(TEST_DOCUMENT_ID.toString()));
 
     }
 

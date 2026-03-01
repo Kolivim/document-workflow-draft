@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,39 +16,36 @@ import ru.kolivim.document.workflow.dto.request.SearchDocumentDto;
 import ru.kolivim.document.workflow.dto.response.DocumentPage;
 import ru.kolivim.document.workflow.dto.response.PageResponseDto;
 import ru.kolivim.document.workflow.dto.response.DocumentSubmitResponseDto;
-import ru.kolivim.document.workflow.entity.Document;
-import ru.kolivim.document.workflow.entity.enums.Status;
 import ru.kolivim.document.workflow.service.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Tag(name = "Api сервиса Документов",
         description = "Сервис для создания, поиска, получения и согласования по запросу Документов")
-@RestController("DocumentController")
+@Validated
+@RestController
 @RequestMapping("/api/v1/document")
 @RequiredArgsConstructor
 public class DocumentController {
 
     private final DocumentService service;
 
-    private final int pageSize = 200;
+    private final int PAGE_SIZE = 200;
 
 
     @Operation(summary = "Поиск",
             description = "Получение документов, c фильтрованием согласно переданным полям фильтра")
     @PostMapping(value = "/filter", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Page<DocumentDto>> getByFilter(@RequestBody SearchDocumentDto searchDocumentDto,
-                                                         @PageableDefault(size = pageSize,
-                                                                 sort = "createDate",
-                                                                 direction = Sort.Direction.DESC) Pageable page
-    ) {
+    public ResponseEntity<Page<DocumentDto>> getByFilter(
+            @Validated(DocumentDto.Search.class) @RequestBody SearchDocumentDto searchDocumentDto,
+            @PageableDefault(size = PAGE_SIZE, sort = "createDate", direction = Sort.Direction.DESC) Pageable page) {
         return ResponseEntity.ok(service.getByFilter(searchDocumentDto, page));
     }
 
@@ -59,46 +57,53 @@ public class DocumentController {
                     """)
     @PostMapping(value = "/advancedFilter", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Page<DocumentDto>> getByAdvancedFilter(@RequestBody SearchDocumentDto searchDocumentDto,
-                                                                 @PageableDefault(size = pageSize,
-                                                                 sort = "createDate",
-                                                                 direction = Sort.Direction.DESC) Pageable page
-    ) {
+    public ResponseEntity<Page<DocumentDto>> getByAdvancedFilter(
+            @Validated(DocumentDto.Search.class) @RequestBody SearchDocumentDto searchDocumentDto,
+            @PageableDefault(size = PAGE_SIZE, sort = "createDate", direction = Sort.Direction.DESC) Pageable page) {
         return ResponseEntity.ok(service.getByAdvancedFilter(searchDocumentDto, page));
     }
 
 
     @Operation(summary = "Создание документа", description = "Создает документ согласно полученным параметрам")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<DocumentDto> create(@RequestBody  @Valid DocumentDto documentDto) {
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Документ успешно создан"),
+            @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
+            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера"
+            )})
+//    @ResponseBody
+    public ResponseEntity<DocumentDto> create(@Validated(DocumentDto.Create.class) @RequestBody DocumentDto documentDto) {
         return ResponseEntity.ok(service.create(documentDto));
     }
 
 
-    @Operation(summary = "Поиск документа", description = "Поиск документа по его id")
+    @Operation(summary = "Поиск документа по id")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Документ найден"),
+            @ApiResponse(responseCode = "404", description = "Документ не найден"),
+            @ApiResponse(responseCode = "400", description = "Неверный формат ID")
+            })
+//    @ResponseBody
     public ResponseEntity<DocumentDto> getDocumentById(
-            @Parameter(description = "Document", required = true) @PathVariable("id") long id) {
+            @Parameter(description = "Id документа", example = "1", required = true)
+            @PathVariable("id") @Min(1) long id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
 
-    @Operation(summary = "Поиск документов",
-            description = "Возвращает список документов, по переданному в запросе списку id документов",
-            parameters = @Parameter(name = "author", description = "Отбираются только документы с указанными id"))
+    @Operation(summary = "Поиск документов по списку Id",
+            description = "Возвращает страницу с документами по переданному списку id документов")
     @Deprecated
     @PostMapping(value = "/documents", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Документы успешно получены")
-//            @ApiResponse(responseCode = "400", description = "Некорректный запрос"),
-//            @ApiResponse(responseCode = "404", description = "Документы не найдены")
-//            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
-    })
+            @ApiResponse(responseCode = "200", description = "Документы успешно получены (может быть пустая страница)"),
+            @ApiResponse(responseCode = "400", description = "Ошибка валидации: список ID должен содержать от 1 до 1000 элементов"),
+            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+            })
     public ResponseEntity<Page<DocumentDto>> getDocumentByIdList(
-            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault(size = PAGE_SIZE, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestBody DocumentsRequestDto documentsRequestDto) {
 
         Page<DocumentDto> pageResult = service.getByIdList(pageable, documentsRequestDto.getIds());
@@ -115,7 +120,7 @@ public class DocumentController {
     @ResponseBody
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Документы успешно получены")})
     public ResponseEntity<ru.kolivim.document.workflow.dto.response.ApiResponse<Page<DocumentDto>>> getDocumentByIdListWithMessage(
-            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault(size = PAGE_SIZE, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestBody DocumentsRequestDto documentsRequestDto) {
 
         PageResponseDto pageResponseDto = service.getByIdListWithNoFound(pageable, documentsRequestDto.getIds());
@@ -137,7 +142,7 @@ public class DocumentController {
     @ResponseBody
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Документы успешно получены")})
     public ResponseEntity<PageResponseDto> getDocumentByIdListWithNoFoundIds(
-            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault(size = PAGE_SIZE, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestBody DocumentsRequestDto documentsRequestDto) {
 
         PageResponseDto pageResponseDto = service.getByIdListWithNoFound(pageable, documentsRequestDto.getIds());
@@ -154,7 +159,7 @@ public class DocumentController {
     @ResponseBody
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Документы успешно получены")})
     public ResponseEntity<Page<DocumentDto>> getDocumentByIdListWithExtendedPage(
-            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault(size = PAGE_SIZE, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestBody DocumentsRequestDto documentsRequestDto) {
 
         DocumentPage pageResult = service.getByIdListWithExtendedPage(pageable, documentsRequestDto.getIds());
@@ -183,7 +188,7 @@ public class DocumentController {
     @ResponseBody
     public ResponseEntity<Page<DocumentDto>> getByFilterWithParameters(
             @RequestBody DocumentDto documentDto,
-            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable page ,
+            @PageableDefault(size = PAGE_SIZE, sort = "createDate", direction = Sort.Direction.DESC) Pageable page ,
 
             /** Формат: ISO 8601 с часовым поясом, например: 2024-01-15T10:30:00+03:00 */
             @Parameter(description = "Дата создания документа. Будут отобраны только документы, созданные после указанной даты")
@@ -200,26 +205,34 @@ public class DocumentController {
     }
 
 
-    @Operation(summary = "Отправляет список документов на согласование",
-            description = "При согласовании документ изменяет статус на SUBMITTED")
+    @Operation(summary = "Отправка на согласование",
+            description = "Отправка на согласование списка документов")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Обработка завершена"),
+            @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
+            @ApiResponse(responseCode = "409", description = "Конфликт статусов")
+    })
     @PutMapping(value = "/submit", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
+//    @ResponseBody
     public ResponseEntity<List<DocumentSubmitResponseDto>> submit(
-            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestBody DocumentsRequestDto documentsRequestDto
-    ) {
+            @PageableDefault(size = PAGE_SIZE, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @Validated(DocumentsRequestDto.Submit.class) @RequestBody DocumentsRequestDto documentsRequestDto) {
         return ResponseEntity.ok(service.submit(pageable, documentsRequestDto));
     }
 
 
-    @Operation(summary = "Отправляет список документов на согласование",
-            description = "При согласовании документ изменяет статус на SUBMITTED")
+    @Operation(summary = "Отправка на утверждение",
+            description = "Отправка на утверждение списка документов")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Обработка завершена"),
+            @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
+            @ApiResponse(responseCode = "409", description = "Конфликт при утверждении")
+    })
     @PutMapping(value = "/approve", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
+//    @ResponseBody
     public ResponseEntity<List<DocumentSubmitResponseDto>> approve(
-            @PageableDefault(size = pageSize, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestBody DocumentsRequestDto documentsRequestDto
-    ) {
+            @PageableDefault(size = PAGE_SIZE, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+            @Validated(DocumentsRequestDto.Approve.class) @RequestBody DocumentsRequestDto documentsRequestDto) {
         return ResponseEntity.ok(service.approve(pageable, documentsRequestDto));
     }
 

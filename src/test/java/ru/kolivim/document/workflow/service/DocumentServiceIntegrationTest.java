@@ -7,6 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -14,17 +18,21 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.kolivim.document.workflow.dto.DocumentDto;
+import ru.kolivim.document.workflow.dto.request.SearchDocumentDto;
+import ru.kolivim.document.workflow.entity.enums.Status;
 import ru.kolivim.document.workflow.exception.ResourceNotFoundException;
 import ru.kolivim.document.workflow.service.impl.DocumentServiceImpl;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
-import java.time.ZonedDateTime;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @Deprecated
@@ -42,27 +50,14 @@ public class DocumentServiceIntegrationTest {
     @Autowired
     private DocumentServiceImpl documentService;
 
-//    @Autowired
-//    CommentService commentService;
-//    @Autowired
-//    CommentRepository commentRepository;
-//    @Autowired
-//    EventNotificationRepository eventNotificationRepository;
-//    @Autowired
-//    SettingsRepository settingsRepository;
-//    @Autowired
-//    NotificationService notificationService;
-//    @Autowired
-//    JwtEncoder jwtEncoder;
-//    @Autowired
-//    TechnicalUserConfig technicalUser;
-//    @Autowired
-//    JwtEncoder accessTokenEncoder;
-//    @Autowired
-//    NotificationsMapper notificationsMapper;
-//    @Autowired
-//    CommentMapperImpl commentMapper;                  //    private static FactoryTest factoryTest;
+    private static final String AUTHOR_DRAFT = "integrationTestDraft author";
+    private static final String AUTHOR_SUBMIT = "integrationTestSubmit author";
+    private static final String AUTHOR_APPROVE = "integrationTestApprove author";
+    private static final String COMMENT_SUBMIT = "integrationTestSubmit comment";
+    private static final String COMMENT_APPROVE = "integrationTestApprove comment";
+    private static final String DOCUMENT_NAME = "integrationTestNDocumentName";
 
+    private static final String INNER_ID_PREFIX = "integrationTest-";
 
     @Container
     @ServiceConnection
@@ -119,14 +114,6 @@ public class DocumentServiceIntegrationTest {
     }
 
 
-    // Разные тесты сервиса:
-    // - Поиск по ID
-    // - Поиск по параметрам
-    // - Обновление документа
-    // - Удаление
-    // - Негативные сценарии
-
-
     @Test
     @Transactional
     @DisplayName("Проверка получения документа по несуществующему Id")
@@ -137,12 +124,62 @@ public class DocumentServiceIntegrationTest {
 
     @Test
     @Transactional
-    @DisplayName("Test getDocumentById with negative ID throws ResourceNotFoundException")
-    public void createException() {
+    @DisplayName("Проверка получения списка документов по статусу")
+    public void getDocumentsByStatus() {
+        log.info("startMethod");
+
+        List<Long> documentIds = createDocuments(1);
+        Long docId = documentIds.get(0);
+
+        Pageable pageable = PageRequest.of(0, 20, Sort.by("createDate").descending());
+        documentService.submit(pageable, documentIds, AUTHOR_SUBMIT, COMMENT_SUBMIT);
+
+        SearchDocumentDto searchDocumentDto = SearchDocumentDto.builder()
+                .status(Status.SUBMITTED)
+                .build();
 
 
+        Page<DocumentDto> findDocumentPage = documentService.getByFilter(searchDocumentDto, pageable);
 
+        assertNotNull(findDocumentPage);
+        assertTrue(findDocumentPage.getTotalElements() == 1, "В списке должен быть 1 документ");
+
+        List<DocumentDto> documentDtoList = findDocumentPage.getContent();
+        assertTrue(findDocumentPage.getTotalElements() == 1, "В списке должен быть 1 документ");
+
+        DocumentDto documentDto = documentDtoList.get(0);
+
+        assertEquals(docId, documentDto.getId(), "Id документа должен совпадать");
+        assertEquals(AUTHOR_DRAFT, documentDto.getAuthor(), "Автор документа должен совпадать");
+        assertEquals(DOCUMENT_NAME, documentDto.getName(), "Имя документа должно совпадать");
+
+
+        log.info("endMethod");
     }
 
+
+    private List<Long> createDocuments(int count) {
+        log.info("startMethod, count: {}", count);
+
+        List<Long> ids = new ArrayList<>();
+
+        for (int i = 0; i < count; i++) {
+
+            DocumentDto request = DocumentDto.builder()
+                    .name(DOCUMENT_NAME)
+                    .author(AUTHOR_DRAFT)
+                    .innerId(INNER_ID_PREFIX + i + "_" + Instant.now())
+                    .build();
+
+            DocumentDto response = documentService.create(request);
+            ids.add(response.getId());
+
+            log.debug("Создан документ со статусом DRAFT, id: {}", response.getId());
+
+        }
+
+        log.info("endMethod, к возврату ids: {}", ids);
+        return ids;
+    }
 
 }

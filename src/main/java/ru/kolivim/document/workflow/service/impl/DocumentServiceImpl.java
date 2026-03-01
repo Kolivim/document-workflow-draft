@@ -169,7 +169,8 @@ public class DocumentServiceImpl implements DocumentService {
     public DocumentDto getById(Long id) {
         log.info("startMethod, id: {}", id);
 
-        Document document = documentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+        Document document = documentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Документ не найден для id: ".concat(id.toString())));
 
         DocumentDto returnDocumentDto = documentMapper.entityToDto(document);
 

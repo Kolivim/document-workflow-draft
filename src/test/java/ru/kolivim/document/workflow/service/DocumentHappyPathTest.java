@@ -1,7 +1,5 @@
 package ru.kolivim.document.workflow.service;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -13,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -26,7 +23,6 @@ import ru.kolivim.document.workflow.entity.Register;
 import ru.kolivim.document.workflow.entity.enums.Action;
 import ru.kolivim.document.workflow.entity.enums.OperationStatus;
 import ru.kolivim.document.workflow.entity.enums.Status;
-import ru.kolivim.document.workflow.exception.ResourceNotFoundException;
 import ru.kolivim.document.workflow.repository.DocumentRepository;
 import ru.kolivim.document.workflow.repository.HistoryRepository;
 import ru.kolivim.document.workflow.repository.RegisterRepository;
@@ -84,14 +80,11 @@ public class DocumentHappyPathTest {
 
     private static ZonedDateTime approvedUpdateDate;
 
-    /** FK БД, на нём и будем ронять и пробовать откатывать транзакцию */
     private static final String INNER_ID_TEST = "12345A/17";
 
     private static final String AUTHOR_TEST = "happyPath author";
 
     private static final String DOCUMENT_NAME_TEST = "happyPath doc";
-
-//    private static final String DOCUMENT_DESCRIPTION_TEST = "happyPath description";
 
     private static final String COMMENT_TEST = "happyPath comment";
 
@@ -339,31 +332,5 @@ public class DocumentHappyPathTest {
                 approvedDocument.getId(), approvedDocument.getStatus());
 
     }
-
-
-    /** Откат транзакции */
-//    @Test
-//    public void approve_whenRegisterFails_shouldRollback() {
-//        // Подготовка: мокаем репозиторий реестра
-//        Long documentId = createDocument(Status.SUBMITTED);
-//
-//        // Настраиваем registerRepository на выброс исключения
-//        doThrow(new DataAccessException("DB error") {})
-//                .when(registerRepository).save(any(Register.class));
-//
-//        // Act
-//        DocumentSubmitResponseDto response = documentService.approve(documentId, "user", "comment");
-//
-//        // Assert
-//        assertEquals(OperationStatus.REGISTER_ERROR, response.getStatus());
-//
-//        // Проверяем, что статус документа НЕ изменился
-//        Document doc = documentRepository.findById(documentId).get();
-//        assertEquals(Status.SUBMITTED, doc.getStatus());
-//
-//        // Проверяем, что история НЕ создалась
-//        List<History> history = historyRepository.findByDocumentId(documentId);
-//        assertTrue(history.isEmpty());
-//    }
 
 }
