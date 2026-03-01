@@ -21,7 +21,7 @@ public class DocumentsRequestDto {
     @NotNull
     private List<@Min(1) @Max(1000) Long> ids;
 
-    @Schema(description = "Лицо, которое отправило документ на утверждение")
+    @Schema(description = "Инициатор действия с документом")
     private String author;
 
     @Schema(description = "Комментарий")

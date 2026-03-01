@@ -28,9 +28,10 @@ public interface DocumentMapper {
     @Mappings({
             @Mapping(target = "historySet", ignore = true),
             @Mapping(target = "register", ignore = true),
-            @Mapping(target = "status", source = "status", defaultValue = "DRAFT"),
+            @Mapping(target = "status", constant = "DRAFT"),
             @Mapping(target = "createDate", expression = "java(java.time.ZonedDateTime.now())"),
             @Mapping(target = "updateDate", ignore = true)
+//            , @Mapping(target = "innerId", expression = "java(java.util.UUID.randomUUID().toString())")
     })
     @Named("dtoToNewEntity")
     Document dtoToNewEntity(DocumentDto documentDto);                                                                   /** @ToNewEntity */

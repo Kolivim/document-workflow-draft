@@ -248,6 +248,7 @@ public class DocumentServiceImpl implements DocumentService {
 
         List<DocumentSubmitResponseDto> documentSubmitResponseDtoList = new ArrayList<>();
 
+        if(idList == null) return documentSubmitResponseDtoList;
 
         for (int i = 1; i <= idList.size(); i++) {
 
@@ -361,16 +362,40 @@ public class DocumentServiceImpl implements DocumentService {
 
         List<DocumentSubmitResponseDto> documentSubmitResponseDtoList = new ArrayList<>();
 
+        if(idList == null) return documentSubmitResponseDtoList;
 
         for (int i = 1; i <= idList.size(); i++) {
 
             Long documentId = idList.get(i-1);
 
+            DocumentSubmitResponseDto result = null;
+
+            try {
+
+                result = approveWithRollback(documentId, author, comment);
+                documentSubmitResponseDtoList.add(result);
+
+            } catch (RegisterSaveException e) {
+
+                log.info("Обработан RegisterSaveException с e.getDocumentId(): {} для documentId: {}, утверждение " +
+                                "(перевод в статус APPROVE) завершено со статусом операции OperationStatus: {}",
+                        e.getDocumentId(), documentId, OperationStatus.CONFLICT);
+
+                result = new DocumentSubmitResponseDto(e.getDocumentId(), OperationStatus.CONFLICT);
+                documentSubmitResponseDtoList.add(result);
+
+            }
+
+
+            /*
             DocumentSubmitResponseDto result = approveWithRollback(documentId, author, comment);
             documentSubmitResponseDtoList.add(result);
+            */
+
 
             log.info("Документ {} из {}, с Id: {} утверждение (перевод в статус APPROVE) завершено со статусом " +
-                    "операции OperationStatus: {}", i, idList.size(), documentId, result.getOperationStatus());
+                    "операции OperationStatus: {}", i, idList.size(), documentId,
+                    result == null ? "NULL" : result.getOperationStatus());
 
         }
 
@@ -383,7 +408,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     /** Approve одного документа в отдельной транзакции */
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = {RegisterSaveException.class, RuntimeException.class})
-    public DocumentSubmitResponseDto approve(Long documentId, String author, String comment) /* throws RegisterSaveException */ {
+    public DocumentSubmitResponseDto approve(Long documentId, String author, String comment) {
         log.info("Начало обработки документа c Id: {}, author: {}, comment: {}", documentId, author, comment);
 
 
@@ -482,10 +507,41 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
 
-    /** Approve одного документа в отдельной транзакции */
+    @Deprecated
+    @Transactional
+    public List<DocumentSubmitResponseDto> approveRollb(Pageable pageable, List<Long> idList, String author, String comment) {
+        log.info("startMethod, начало утверждения (APPROVED) полученного списка размером: {}, documentsRequestDto: {}, " +
+                        "author: {}, comment:{}, pageable: {}", idList != null ? idList.size() : "NULL",
+                idList, author, comment, pageable);
+
+        List<DocumentSubmitResponseDto> documentSubmitResponseDtoList = new ArrayList<>();
+
+        if(idList == null) return documentSubmitResponseDtoList;
+
+        for (int i = 1; i <= idList.size(); i++) {
+
+            Long documentId = idList.get(i-1);
+
+            DocumentSubmitResponseDto result = approveWithRollbackNoException(documentId, author, comment);
+            documentSubmitResponseDtoList.add(result);
+
+            log.info("Документ {} из {}, с Id: {} утверждение (перевод в статус APPROVE) завершено со статусом " +
+                            "операции OperationStatus: {}", i, idList.size(), documentId,
+                    result == null ? "NULL" : result.getOperationStatus());
+
+        }
+
+
+        log.info("endMethod, завершено утверждение (APPROVED) полученного списка размером: {}, к возврату " +
+                "submitDocumentDtoList: {}", idList != null ? idList.size() : "NULL", documentSubmitResponseDtoList);
+        return documentSubmitResponseDtoList;
+    }
+
+
+    @Deprecated
     @Transactional(propagation = Propagation.REQUIRES_NEW,
             rollbackFor = {RegisterSaveException.class, RuntimeException.class})
-    public DocumentSubmitResponseDto approveWithRollback(Long documentId, String author, String comment) {
+    public DocumentSubmitResponseDto approveWithRollbackNoException(Long documentId, String author, String comment) {
 
         log.info("Начало обработки документа c Id: {}, author: {}, comment: {}", documentId, author, comment);
 
@@ -556,6 +612,98 @@ public class DocumentServiceImpl implements DocumentService {
                 log.error("Ошибка БД при сохранении в реестр для документа {}: {}", documentId, e.getMessage());        /** ERROR БД, в т.ч. по FK */
                 status.setRollbackOnly();
                 return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);
+            }
+
+
+            log.info("Конец транзакции для документа с Id: {}, документ успешно утверждён", documentId);
+            return new DocumentSubmitResponseDto(documentId, OperationStatus.SUCCESS);
+        });
+
+    }
+
+
+    /** Approve одного документа в отдельной транзакции */
+    @Transactional(propagation = Propagation.REQUIRES_NEW,
+            rollbackFor = {RegisterSaveException.class, RuntimeException.class})
+    public DocumentSubmitResponseDto approveWithRollback(Long documentId, String author, String comment) {
+
+        log.info("Начало обработки документа c Id: {}, author: {}, comment: {}", documentId, author, comment);
+
+        return transactionTemplate.execute(status -> {
+
+            log.info("Начало транзакции для обработки документа c Id: {}, author: {}, comment: {}",
+                    documentId, author, comment);
+
+
+            boolean isDocumentExist = documentRepository.existsById(documentId);
+
+            if (!isDocumentExist) {
+                log.info("Документ c Id: {} не найден", documentId);
+                return new DocumentSubmitResponseDto(documentId, OperationStatus.NOT_FOUND);
+            }
+
+
+            /** Обновление статуса документа: */
+            int updatedDocumentStatusCount = documentRepository.updateStatusIfExpected(
+                    documentId,
+                    Status.SUBMITTED,
+                    Status.APPROVED
+            );
+
+            if (updatedDocumentStatusCount == 0) {
+                Status newStatus = documentRepository.findStatusById(documentId).orElse(Status.SUBMITTED);
+                log.info("Конфликт при обновлении статуса документа {}: {}", documentId, newStatus);
+                status.setRollbackOnly();
+//                return new DocumentSubmitResponseDto(documentId, OperationStatus.CONFLICT);
+                throw new RegisterSaveException("Ошибка сохранения записи в реестр для документа с id: "
+                        .concat(documentId.toString()), documentId);
+            }
+
+
+            /** Запись в историю: */
+            Document document = documentRepository.getById(documentId);
+
+
+            History history = History.builder()
+                    .document(document)
+                    .action(Action.APPROVE)
+                    .author(author != null ? author : "SYSTEM")
+                    .comment(comment)
+                    .date(document.getUpdateDate())
+                    .build();
+
+            History savedHistory = historyRepository.save(history);
+
+            if (savedHistory == null || savedHistory.getId() == null) {
+                log.info("Не удалось создать запись в Истории для documentId: {}, savedHistory: {}",
+                        documentId, savedHistory);
+                status.setRollbackOnly();
+//                return new DocumentSubmitResponseDto(documentId, OperationStatus.CONFLICT);
+                throw new RegisterSaveException("Ошибка сохранения записи в реестр для документа с id: "
+                        .concat(documentId.toString()), documentId);
+            }
+
+
+            /** Запись в реестр: */
+            try {
+
+                int registerInserted = registerRepository.insertIfNotExists(/*Long.valueOf(-1) */ documentId );
+
+                if (registerInserted == 0) {
+                    log.info("Не удалось создать запись в реестре для documentId: {}, registerInserted: {}",            /** Запись уже существует */
+                            documentId, registerInserted);
+                    status.setRollbackOnly();
+//                    return new DocumentSubmitResponseDto(documentId, OperationStatus.CONFLICT);
+                    throw new RegisterSaveException("Ошибка сохранения записи в реестр для документа с id: "
+                            .concat(documentId.toString()), documentId);
+                }
+
+            } catch (DataAccessException e) {
+                log.error("Ошибка БД при сохранении в реестр для документа {}: {}", documentId, e.getMessage());        /** ERROR БД, в т.ч. по FK */
+                status.setRollbackOnly();
+//                return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);
+                throw new RegisterSaveException("Ошибка сохранения записи в реестр для документа с id: "
+                        .concat(documentId.toString()), documentId);
             }
 
 

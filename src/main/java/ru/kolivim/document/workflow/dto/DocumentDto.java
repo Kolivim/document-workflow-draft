@@ -16,8 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class DocumentDto {
 
-    @Schema(description = "id")
-    @NotEmpty
+    @Schema(description = "id, игнорируется при создании")
     private Long id;
 
     @Schema(description = "inner_id")
@@ -32,25 +31,23 @@ public class DocumentDto {
     @NotEmpty
     private String name;
 
-    @Schema(description = "description")
+    @Schema(description = "description, игнорируется при создании")
     private String description;
 
-    @Schema(description = "status")
-    @NotEmpty
+    @Schema(description = "status, игнорируется при создании")
     private Status status;
 
-    @Schema(description = "create_date")
-    @NotEmpty
+    @Schema(description = "create_date, игнорируется при создании")
     private ZonedDateTime createDate;
 
-    @Schema(description = "update_date")
+    @Schema(description = "update_date, игнорируется при создании")
     private ZonedDateTime updateDate;
 
 
-    @Schema(description = "historySet")
+    @Schema(description = "historySet, игнорируется при создании")
     private Set<HistoryDto> historySet;
 
-    @Schema(description = "register")
+    @Schema(description = "register, игнорируется при создании")
     private RegisterDto register;
 
 }

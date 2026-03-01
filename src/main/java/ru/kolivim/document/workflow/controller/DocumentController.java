@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -67,10 +68,10 @@ public class DocumentController {
     }
 
 
-    @Operation(summary = "Создает документ", description = "Создает документ согласно полученным параметрам")
+    @Operation(summary = "Создание документа", description = "Создает документ согласно полученным параметрам")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<DocumentDto> create(@RequestBody DocumentDto documentDto) {
+    public ResponseEntity<DocumentDto> create(@RequestBody  @Valid DocumentDto documentDto) {
         return ResponseEntity.ok(service.create(documentDto));
     }
 
@@ -194,7 +195,6 @@ public class DocumentController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             ZonedDateTime endDate
     ) {
-        /** Реализовать через маппер */
         SearchDocumentDto searchDocumentDto = new SearchDocumentDto(documentDto, startDate, endDate);
         return ResponseEntity.ok(service.getByFilter(searchDocumentDto, page));
     }

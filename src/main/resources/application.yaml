@@ -16,6 +16,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
+#      default_schema: doc_workflow  #Новое, добавлено для тестов - проверить что не будет накладок
 #    show-sql:false
 
   liquibase:

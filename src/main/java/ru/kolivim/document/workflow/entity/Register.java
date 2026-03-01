@@ -15,10 +15,11 @@ public class Register {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(mappedBy = "register")
+//    @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
     private Document document;
 
 }

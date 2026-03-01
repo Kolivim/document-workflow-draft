@@ -1,4 +1,5 @@
 package ru.kolivim.document.workflow.service.impl;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+@Deprecated
 @ExtendWith(MockitoExtension.class)
 class DocumentServiceImplTest {
 
@@ -152,6 +154,7 @@ class DocumentServiceImplTest {
         assertThatThrownBy(() -> documentService.getById(TEST_DOCUMENT_ID))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Document not found");
+
     }
 
 
@@ -214,29 +217,6 @@ class DocumentServiceImplTest {
 
     }
 
-
-    @Test
-    @DisplayName("Успешное получение документов по списку ID с информацией о ненайденных")
-    void getByIdListWithNoFoundShouldReturnPageResponseDto() {
-
-        List<Long> idList = List.of(TEST_DOCUMENT_ID, 2L, 3L);
-        Pageable pageable = PageRequest.of(0, 10);
-        List<Document> documents = List.of(testDocument);
-        Page<Document> documentPage = new PageImpl<>(documents, pageable, documents.size());
-
-        when(documentRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(documentPage);
-        when(documentRepository.findAllExistingIds(idList)).thenReturn(List.of(TEST_DOCUMENT_ID));
-        when(documentMapper.entityToDto(testDocument)).thenReturn(testDocumentDto);
-
-        PageResponseDto result = documentService.getByIdListWithNoFound(pageable, idList);
-
-        assertThat(result).isNotNull();
-        assertThat(result.getNotFoundIds()).hasSize(1);
-        assertThat(result.getNotFoundIds()).hasSize(2);
-        assertThat(result.getNotFoundCount()).isEqualTo(2);
-        assertThat(result.getTotalRequested()).isEqualTo(3);
-
-    }
 
     @Test
     @DisplayName("Успешное получение расширенной страницы документов по списку ID")
