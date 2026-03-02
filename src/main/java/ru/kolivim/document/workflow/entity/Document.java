@@ -12,13 +12,6 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-
-/**
- * DocumentEntity
- *
- * @author Kolivim
- */
-
 @Table(name = "documents", schema = "doc_workflow")
 @Entity
 @Setter
@@ -61,21 +54,10 @@ public class Document {
     @OneToMany(mappedBy = "document", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("author")
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-    //@SortComparator(PropertySource.Comparator.class)
     private Set<History> historySet;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id", referencedColumnName = "id")
     private Register register;
-
-
-    /*
-    @PrePersist
-    public void generateInnerId() {
-        if (innerId == null) {
-            innerId = UUID.randomUUID().toString();
-        }
-    }
-    */
 
 }

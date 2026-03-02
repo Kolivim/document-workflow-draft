@@ -33,7 +33,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long>, JpaSp
     @Modifying
     @Transactional
     @Query("UPDATE Document d SET d.status = :newStatus, d.updateDate = CURRENT_TIMESTAMP " +
-            "WHERE d.id = :id AND d.status = :expectedStatus")                                                          /** + "RETURNING d.status */
+            "WHERE d.id = :id AND d.status = :expectedStatus")
     int updateStatusIfExpected(@Param("id") Long id,
                                @Param("expectedStatus") Status expectedStatus,
                                @Param("newStatus") Status newStatus);
@@ -44,7 +44,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long>, JpaSp
 
     boolean existsByIdAndStatus(Long id, Status status);
 
-    @Query("SELECT d FROM Document d WHERE d.status = :status ORDER BY d.createDate")                                   /** @Lock(LockModeType.PESSIMISTIC_WRITE) */
+    @Query("SELECT d FROM Document d WHERE d.status = :status ORDER BY d.createDate")
     List<Document> findDocumentsByStatus (@Param("status") Status status, Pageable pageable);
 
     @Query("SELECT COUNT(d) FROM Document d WHERE d.status = :status")

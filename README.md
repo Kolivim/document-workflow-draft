@@ -1,6 +1,6 @@
 # Document Workflow Service
 
-Backend-сервис по работе c документами.
+Backend-сервис по работе с документами.
 Документы создаются, переводятся по статусам, по изменениям статуса ведётся история.
 
 Дополнительно предусмотрена утилита для массового создания документов и фоновая обработка документов пачками
@@ -20,6 +20,7 @@ Backend-сервис по работе c документами.
 - [Масштабирование и опциональные улучшения](#масштабирование-и-опциональные-улучшения)
 
 ## Стек технологий
+
 Java 17 + Spring Boot 3
 
 PostgreSQL 17
@@ -494,7 +495,7 @@ Circuit Breaker и Retry защищают систему от каскадных
    2026-02-26T23:44:43.468+03:00  INFO 27700 --- [document-workflow] [nio-8080-exec-9] r.k.d.w.s.impl.DocumentServiceImpl       : endMethod, к возврату documentDto: DocumentDto(id=null, innerId=4c559924-ffc6-44ae-a05a-e1a4e9014115, author=I'm author, name=MyDoc, description=Описание, status=null, createDate=2020-01-28T23:59:59Z, updateDate=null, historySet=null, register=null)
 
 
-2. Фоновая обработка:
+2. Прогресс фоновых воркеров во время фоновой обработки:
 
    2026-02-26T22:54:55.297+03:00  INFO 35680 --- [document-workflow] [   doc-worker-1] r.k.d.workflow.worker.ApproveWorker      : startMethod
    2026-02-26T22:54:55.304+03:00  INFO 35680 --- [document-workflow] [   doc-worker-1] r.k.d.w.s.DocumentProcessingService      : startMethod поиск документов со статусом SUBMITTED, для отправки на утверждение, размер пакета batchSize: 10
@@ -508,7 +509,7 @@ Circuit Breaker и Retry защищают систему от каскадных
    2026-02-26T22:54:55.811+03:00  INFO 35680 --- [document-workflow] [   doc-worker-1] r.k.d.workflow.worker.ApproveWorker      : endMethod
 
 
-4. Утилита генерации:
+4.  Прогресс генерации документов утилитой генерации:
 
    2026-02-26T22:04:52.003+03:00  INFO 15216 --- [document-workflow] [           main] r.k.d.w.u.generator.GeneratorProperties  : ╔══════════════════════════════════════════════════════════════╗
    2026-02-26T22:04:52.004+03:00  INFO 15216 --- [document-workflow] [           main] r.k.d.w.u.generator.GeneratorProperties  : ║         УТИЛИТА МАССОВОГО СОЗДАНИЯ ДОКУМЕНТОВ                                       ║

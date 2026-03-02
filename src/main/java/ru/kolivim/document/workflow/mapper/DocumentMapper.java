@@ -17,13 +17,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Mapper(componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE /*, uses = {RegisterMapper.class , HistoryMapper.class} */ )
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface DocumentMapper {
 
     @Mapping(target = "historySet", source = "historySet", qualifiedByName = "toEntityHistorySet")
     @Mapping(target = "register", source = "register", qualifiedByName = "toEntityRegister")
     Document dtoToEntity(DocumentDto documentDto);                                                                      /** @ToExistingEntity */
+
 
     @Mappings({
             @Mapping(target = "historySet", ignore = true),
@@ -31,20 +31,24 @@ public interface DocumentMapper {
             @Mapping(target = "status", constant = "DRAFT"),
             @Mapping(target = "createDate", expression = "java(java.time.ZonedDateTime.now())"),
             @Mapping(target = "updateDate", ignore = true)
-//            , @Mapping(target = "innerId", expression = "java(java.util.UUID.randomUUID().toString())")
     })
     @Named("dtoToNewEntity")
     Document dtoToNewEntity(DocumentDto documentDto);                                                                   /** @ToNewEntity */
 
+
     @Mappings({
-            @Mapping(target = "historySet", source = "historySet", qualifiedByName = "toDtoHistorySet", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL),
-            @Mapping(target = "register", source = "register", qualifiedByName = "toDtoRegister", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
+            @Mapping(target = "historySet", source = "historySet", qualifiedByName = "toDtoHistorySet",
+                    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL),
+            @Mapping(target = "register", source = "register", qualifiedByName = "toDtoRegister",
+                    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     })
     DocumentDto entityToDto(Document document);
+
 
     List<Document> dtosToEntities(List<DocumentDto> documentDtos);
 
     List<DocumentDto> entitiesToDtos(List<Document> documents);
+
 
     @Named("toEntityHistorySet")
     default Set<History> toEntityHistorySet(Set<HistoryDto> historyDtoSet){
@@ -61,13 +65,13 @@ public interface DocumentMapper {
         return historySet;
     }
 
+
     @Named("toEntityRegister")
     default Register toEntityRegister(RegisterDto registerDto){
         return Register.builder()
                 .id(registerDto == null? 0: registerDto.getId())
                 .build();
     }
-
 
 
     @Named("toDtoHistorySet")
@@ -87,6 +91,7 @@ public interface DocumentMapper {
         }
         return historyDtoSet;
     }
+
 
     @Named("toDtoRegister")
     default RegisterDto toDtoRegister(Register register){

@@ -11,7 +11,6 @@ import ru.kolivim.document.workflow.config.BatchConfig;
 import ru.kolivim.document.workflow.service.DocumentProcessingService;
 
 @Slf4j
-//@Profile("!generator")
 @Component
 @AllArgsConstructor
 @ConditionalOnProperty(name = "app.workers.enabled", havingValue = "true", matchIfMissing = true)

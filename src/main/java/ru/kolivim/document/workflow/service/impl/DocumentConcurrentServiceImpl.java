@@ -40,9 +40,7 @@ public class DocumentConcurrentServiceImpl implements DocumentConcurrentService 
 
         AtomicBoolean isSuccessWork = new AtomicBoolean(true);
 
-
         Document document = getCorrectDocument(request.getDocumentId());
-//        if(document == null) return ConcurrentResponseDto.builder().isSuccess(false).build();
 
 
         ExecutorService executor = Executors.newFixedThreadPool(request.getThreads());
@@ -284,15 +282,13 @@ public class DocumentConcurrentServiceImpl implements DocumentConcurrentService 
         if(!documentOptional.isPresent()) {
             log.info("Не найден документ с documentId: {}", documentId);
             throw new ResourceNotFoundException("Документ не найден для id: ".concat(documentId.toString()));
-//            return null /** Написать далее реализацию ответа - Документ не найден */ ;
         }
 
         Document document = documentOptional.get();
 
-        if (document.getStatus() != Status.SUBMITTED/*.SUBMITTED*/) {
+        if (document.getStatus() != Status.SUBMITTED) {
             log.info("Не корректный статус документа с documentId: {}", documentId);
             throw new InvalidStatusTransitionException(documentId, document.getStatus(), Status.APPROVED);
-//            return null;
         }
 
         log.debug("endMethod, к возврату document: {}", document);

@@ -202,7 +202,7 @@ public class DocumentHappyPathTest {
                 .comment(COMMENT_TEST)
                 .build();
 
-        Pageable pageable = PageRequest.of(0, 20, Sort.by("create_date").descending());     /** Sort.Direction.DESC, "createDate" */
+        Pageable pageable = PageRequest.of(0, 20, Sort.by("create_date").descending());
         List<DocumentSubmitResponseDto> response = documentService.submit(pageable, documentsRequestDto);
 
         assertNotNull(response);

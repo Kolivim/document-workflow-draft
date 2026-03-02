@@ -12,7 +12,6 @@ import ru.kolivim.document.workflow.service.DocumentProcessingService;
 
 @Slf4j
 @Component
-//@Profile("!generator")
 @AllArgsConstructor
 @ConditionalOnProperty(name = "app.workers.enabled", havingValue = "true", matchIfMissing = true)
 public class ApproveWorker {

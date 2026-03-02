@@ -6,8 +6,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import javax.sql.DataSource;
 
-
-//@Configuration
 public class TestConfiguration {
 
     @Bean(initMethod = "start", destroyMethod = "stop")

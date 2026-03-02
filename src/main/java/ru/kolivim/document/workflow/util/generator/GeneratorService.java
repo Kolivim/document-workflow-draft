@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
-//@RequiredArgsConstructor
 public class GeneratorService {
 
     private final RestTemplate restTemplate;

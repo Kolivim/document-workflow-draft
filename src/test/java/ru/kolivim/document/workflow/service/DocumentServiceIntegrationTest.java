@@ -73,7 +73,7 @@ public class DocumentServiceIntegrationTest {
 
     @BeforeAll
     static void beforeAll() {
-        postgres.start();                                                                                               //        factoryTest = new FactoryTest();
+        postgres.start();
         createRole();
     }
 

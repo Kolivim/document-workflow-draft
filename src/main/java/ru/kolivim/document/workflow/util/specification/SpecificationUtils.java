@@ -38,13 +38,17 @@ public class SpecificationUtils {
     public static <T, K> Specification<T> between(String key, Integer ageFrom,  Integer ageTo) {
         Specification<T> spec = null;
         if((ageFrom==null)&(ageTo!=null)){
-            spec = (root, query, criteriaBuilder) ->  criteriaBuilder.greaterThan(root.get(key),  ZonedDateTime.now().minusYears((int)ageTo));
+            spec = (root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThan(root.get(key),  ZonedDateTime.now().minusYears((int)ageTo));
         }
         else if(((ageFrom!=null)&(ageTo==null))){
-            spec = (root, query, criteriaBuilder) ->  criteriaBuilder.lessThan(root.get(key),  ZonedDateTime.now().minusYears((int)ageFrom));
+            spec = (root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThan(root.get(key),  ZonedDateTime.now().minusYears((int)ageFrom));
         }
         else if(((ageFrom!=null)&(ageTo!=null))) {
-            spec = (root, query, criteriaBuilder) ->  criteriaBuilder.between(root.get(key), ZonedDateTime.now().minusYears((int) ageTo), ZonedDateTime.now().minusYears((int) ageFrom));
+            spec = (root, query, criteriaBuilder) ->
+                    criteriaBuilder.between(root.get(key), ZonedDateTime.now().minusYears((int) ageTo),
+                            ZonedDateTime.now().minusYears((int) ageFrom));
         }
         return spec;
     }

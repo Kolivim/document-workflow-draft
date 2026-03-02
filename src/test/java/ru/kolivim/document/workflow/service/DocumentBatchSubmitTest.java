@@ -71,8 +71,6 @@ public class DocumentBatchSubmitTest {
     private static final String COMMENT_APPROVE = "batchApprove comment";
     private static final String DOCUMENT_NAME_PREFIX = "batchNameTestSubmit-";
 
-//    private static final String DOCUMENT_DESCRIPTION_TEST = "test description ";
-
     private static final String INNER_ID_PREFIX = "batchTestSubmit-";
 
 
@@ -290,15 +288,6 @@ public class DocumentBatchSubmitTest {
 
             assertNotEquals(historySubmit.getDate(), historyApprove.getDate(), "Даты не должны совпадать");
 
-
-//            ZonedDateTime submittedUpdateDate = doc.getUpdateDate();
-//            LocalDate submittedLocalDate = submittedUpdateDate.toLocalDate();
-//            assertAll(
-//                    () -> assertNotNull(submittedUpdateDate),
-//                    () -> assertEquals(Year.now().getValue(), submittedUpdateDate.getYear(), "Год обновления должна быть текущим"),
-//                    () -> assertEquals(startLocalDate,submittedLocalDate, "Дата обновления должна совпадать")
-//            );
-
         }
 
 
@@ -316,7 +305,7 @@ public class DocumentBatchSubmitTest {
         }
 
 
-        log.info("✓ Пакетный submit: результаты - успех: {}, конфликт: {}, не найдено: {}",
+        log.info("endMethod, пакетный submit: результаты - успех: {}, конфликт: {}, не найдено: {}",
                 successCount, conflictCount, notFoundCount);
     }
 
@@ -339,7 +328,7 @@ public class DocumentBatchSubmitTest {
         assertNotNull(results);
         assertTrue(results.isEmpty(), "Результат должен быть пустым списком");
 
-        log.info("Пакетный Submit, пустой список обработан корректно");
+        log.info("endMethod, пакетный Submit, пустой список обработан корректно");
     }
 
 
@@ -360,7 +349,7 @@ public class DocumentBatchSubmitTest {
         assertNotNull(results);
         assertTrue(results.isEmpty(), "Результат должен быть пустым списком");
 
-        log.info("Пакетный Submit, пустой список обработан корректно");
+        log.info("endMethod, пакетный Submit, пустой список обработан корректно");
     }
 
 
@@ -389,7 +378,7 @@ public class DocumentBatchSubmitTest {
     }
 
 
-    /** Принимает список id в статусе DRAFT */
+    /** @param ids список id документов в статусе DRAFT */
     private void submitDocuments(List<Long> ids) {
         log.info("startMethod, ids: {}", ids);
 
@@ -411,7 +400,7 @@ public class DocumentBatchSubmitTest {
     }
 
 
-    /** Принимает список id в статусе SUBMITTED */
+    /** @param ids список id документов в статусе SUBMITTED */
     private void approveDocuments(List<Long> ids) {
         log.info("startMethod, ids: {}", ids);
 

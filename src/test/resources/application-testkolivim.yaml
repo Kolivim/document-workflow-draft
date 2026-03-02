@@ -2,9 +2,8 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/migration/database-doc.workflow-changelog-master.xml
-    # Добавляем параметр для игнорирования дубликатов
     parameters:
-      liquibase.duplicateFileMode: WARN  # или IGNORE
+      liquibase.duplicateFileMode: WARN
 
   jpa:
     hibernate:
@@ -12,6 +11,6 @@ spring:
 
 logging:
   level:
-    liquibase: INFO                        # Видеть предупреждения Liquibase
+    liquibase: INFO
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql: TRACE

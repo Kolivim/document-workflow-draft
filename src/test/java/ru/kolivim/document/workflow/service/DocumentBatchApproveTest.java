@@ -226,10 +226,10 @@ public class DocumentBatchApproveTest {
         submitIds = submitIds.subList(0, 10);
 
         List<Long> mixedIds = new ArrayList<>();
-        mixedIds.addAll(draftIds);                                                                                      /** Конфликт */
-        mixedIds.addAll(submitIds);                                                                                     /** Успешно */
-        mixedIds.addAll(approveIds);                                                                                    /** Конфликт */
-        mixedIds.addAll(notExistIds);                                                                                   /** Не найдены */
+        mixedIds.addAll(draftIds);
+        mixedIds.addAll(submitIds);
+        mixedIds.addAll(approveIds);
+        mixedIds.addAll(notExistIds);
 
         DocumentsRequestDto request = DocumentsRequestDto.builder()
                 .ids(mixedIds)
@@ -277,7 +277,7 @@ public class DocumentBatchApproveTest {
 
         for (int i = 0; i < submitIds.size(); i++) {
 
-            Long id = submitIds.get(i);                                                                                 /** Id документа SUBMITTED -> APPROVE */
+            Long id = submitIds.get(i);
             DocumentSubmitResponseDto approveResponse = results.get(i + 10);
 
             Document doc = documentRepository.findById(id).get();
@@ -318,7 +318,7 @@ public class DocumentBatchApproveTest {
 
         for (int i = 0; i < approveIds.size(); i++) {
 
-            Long id = approveIds.get(i); /** Id документа APPROVE x->x APPROVE */
+            Long id = approveIds.get(i);
             DocumentSubmitResponseDto response = results.get(i + 20);
 
             Document doc = documentRepository.findById(id).get();
@@ -457,15 +457,6 @@ public class DocumentBatchApproveTest {
         Pageable pageable = PageRequest.of(0, 20, Sort.by("create_date").descending());
         documentService.submit(pageable, documentIds, AUTHOR_SUBMIT, COMMENT_SUBMIT);
 
-
-//        DocumentSubmitResponseDto response = null;
-//        try {
-//            response = documentService.approveWithRollback(docId, AUTHOR_APPROVE, COMMENT_APPROVE);
-//        } catch ( RegisterSaveException /* UnexpectedRollbackException */ e) {
-//            log.info("Ожидаемое исключение при откате транзакции: {}", e.getMessage());
-//        }
-
-
         DocumentsRequestDto documentsRequestDto = DocumentsRequestDto.builder()
                 .ids(documentIds)
                 .author(AUTHOR_APPROVE)
@@ -532,18 +523,6 @@ public class DocumentBatchApproveTest {
         List<DocumentSubmitResponseDto> response = documentService.approve(pageable, documentsRequestDto);
 
 
-        /*
-        List<DocumentSubmitResponseDto> responseList = documentService.approve(pageable, documentIds, AUTHOR_APPROVE, COMMENT_APPROVE);
-        DocumentSubmitResponseDto response = documentService.approveWithRollback(docId, AUTHOR_APPROVE, COMMENT_APPROVE);
-
-
-        assertEquals(docId, response.getId(), "Id документа должен совпадать");
-
-        assertEquals(OperationStatus.CONFLICT, response.getOperationStatus(),
-                String.format("Операция с Документом %d должна завершится CONFLICT", docId));
-        */
-
-
         assertNotNull(response);
         assertFalse(response.isEmpty());
         assertTrue(response.size() == 1, "Должен быть один документ в ответе");
@@ -564,7 +543,7 @@ public class DocumentBatchApproveTest {
     }
 
 
-    /** Принимает список id в статусе DRAFT */
+    /** @param ids список id документов в статусе DRAFT */
     private void submitDocuments(List<Long> ids) {
         log.info("startMethod, ids: {}", ids);
 
@@ -586,7 +565,7 @@ public class DocumentBatchApproveTest {
     }
 
 
-    /** Принимает список id в статусе SUBMITTED */
+    /** @param ids список id документов в статусе SUBMITTED */
     private void approveDocuments(List<Long> ids) {
         log.info("startMethod, ids: {}", ids);
 

@@ -3,7 +3,6 @@ package ru.kolivim.document.workflow.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.kolivim.document.workflow.dto.DocumentDto;
 import ru.kolivim.document.workflow.dto.request.SearchDocumentDto;
@@ -38,8 +37,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static ru.kolivim.document.workflow.dto.response.ApiResponse.success;
 
 @Slf4j
 @Service
@@ -391,12 +388,6 @@ public class DocumentServiceImpl implements DocumentService {
             }
 
 
-            /*
-            DocumentSubmitResponseDto result = approveWithRollback(documentId, author, comment);
-            documentSubmitResponseDtoList.add(result);
-            */
-
-
             log.info("Документ {} из {}, с Id: {} утверждение (перевод в статус APPROVE) завершено со статусом " +
                     "операции OperationStatus: {}", i, idList.size(), documentId,
                     result == null ? "NULL" : result.getOperationStatus());
@@ -438,7 +429,7 @@ public class DocumentServiceImpl implements DocumentService {
 
                 int registerInserted = registerRepository.insertIfNotExists(documentId);
 
-                if (registerInserted == 0) {                                                                            /** Запись уже есть */
+                if (registerInserted == 0) {
 
                     log.info("Конфликт при создании записи в Реестре для документа {}, запись уже существует", documentId);
 
@@ -446,7 +437,6 @@ public class DocumentServiceImpl implements DocumentService {
 
                 } else {
 
-                    /** Обновление статуса: */
                     int updatedCount = documentRepository.updateStatusIfExpected(
                             documentId,
                             Status.SUBMITTED,
@@ -456,7 +446,6 @@ public class DocumentServiceImpl implements DocumentService {
 
                     if (updatedCount == 0) {
 
-                        /** Статус мог измениться в другом потоке */
                         Status newStatus = documentRepository.findStatusById(documentId).orElse(Status.SUBMITTED);
 
                         log.info("Конфликт при обновлении документа {}: {}", documentId, newStatus == Status.APPROVED ?
@@ -469,7 +458,6 @@ public class DocumentServiceImpl implements DocumentService {
 
                         Document document = documentRepository.getById(documentId);
 
-                        /** Запись в историю: */
                         History history = History.builder()
                                 .document(document)
                                 .action(Action.APPROVE)
@@ -600,20 +588,19 @@ public class DocumentServiceImpl implements DocumentService {
             }
 
 
-            /** Запись в реестр: */
             try {
 
                 int registerInserted = registerRepository.insertIfNotExists(/*Long.valueOf(-1) */ documentId );
 
                 if (registerInserted == 0) {
-                    log.info("Не удалось создать запись в реестре для documentId: {}, registerInserted: {}",            /** Запись уже существует */
+                    log.info("Не удалось создать запись в реестре для documentId: {}, registerInserted: {}",
                             documentId, registerInserted);
                     status.setRollbackOnly();
                     return new DocumentSubmitResponseDto(documentId, OperationStatus.CONFLICT);
                 }
 
             } catch (DataAccessException e) {
-                log.error("Ошибка БД при сохранении в реестр для документа {}: {}", documentId, e.getMessage());        /** ERROR БД, в т.ч. по FK */
+                log.error("Ошибка БД при сохранении в реестр для документа {}: {}", documentId, e.getMessage());
                 status.setRollbackOnly();
                 return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);
             }
@@ -647,7 +634,6 @@ public class DocumentServiceImpl implements DocumentService {
             }
 
 
-            /** Обновление статуса документа: */
             int updatedDocumentStatusCount = documentRepository.updateStatusIfExpected(
                     documentId,
                     Status.SUBMITTED,
@@ -658,7 +644,6 @@ public class DocumentServiceImpl implements DocumentService {
                 Status newStatus = documentRepository.findStatusById(documentId).orElse(Status.SUBMITTED);
                 log.info("Конфликт при обновлении статуса документа {}: {}", documentId, newStatus);
                 status.setRollbackOnly();
-//                return new DocumentSubmitResponseDto(documentId, OperationStatus.CONFLICT);
                 throw new RegisterSaveException("Ошибка сохранения записи в реестр для документа с id: "
                         .concat(documentId.toString()), documentId);
             }
@@ -682,30 +667,26 @@ public class DocumentServiceImpl implements DocumentService {
                 log.info("Не удалось создать запись в Истории для documentId: {}, savedHistory: {}",
                         documentId, savedHistory);
                 status.setRollbackOnly();
-//                return new DocumentSubmitResponseDto(documentId, OperationStatus.CONFLICT);
                 throw new RegisterSaveException("Ошибка сохранения записи в реестр для документа с id: "
                         .concat(documentId.toString()), documentId);
             }
 
 
-            /** Запись в реестр: */
             try {
 
                 int registerInserted = registerRepository.insertIfNotExists(/*Long.valueOf(-1) */ documentId );
 
                 if (registerInserted == 0) {
-                    log.info("Не удалось создать запись в реестре для documentId: {}, registerInserted: {}",            /** Запись уже существует */
+                    log.info("Не удалось создать запись в реестре для documentId: {}, registerInserted: {}",
                             documentId, registerInserted);
                     status.setRollbackOnly();
-//                    return new DocumentSubmitResponseDto(documentId, OperationStatus.CONFLICT);
                     throw new RegisterSaveException("Ошибка сохранения записи в реестр для документа с id: "
                             .concat(documentId.toString()), documentId);
                 }
 
             } catch (DataAccessException e) {
-                log.error("Ошибка БД при сохранении в реестр для документа {}: {}", documentId, e.getMessage());        /** ERROR БД, в т.ч. по FK */
+                log.error("Ошибка БД при сохранении в реестр для документа {}: {}", documentId, e.getMessage());
                 status.setRollbackOnly();
-//                return new DocumentSubmitResponseDto(documentId, OperationStatus.REGISTER_ERROR);
                 throw new RegisterSaveException("Ошибка сохранения записи в реестр для документа с id: "
                         .concat(documentId.toString()), documentId);
             }

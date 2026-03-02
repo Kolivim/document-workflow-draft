@@ -16,7 +16,8 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
      * @param documentId идентификатор документа, для которого создается запись в реестре
      * @return количество вставленных строк, для случая существования записи вернется 0
      * */
-    @Query(value = "INSERT INTO doc_workflow.register (id) VALUES (:documentId) ON CONFLICT (id) DO NOTHING", nativeQuery = true)
+    @Query(value = "INSERT INTO doc_workflow.register (id) VALUES (:documentId) ON CONFLICT (id) DO NOTHING",
+            nativeQuery = true)
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Transactional
     int insertIfNotExists(@Param("documentId") Long documentId);

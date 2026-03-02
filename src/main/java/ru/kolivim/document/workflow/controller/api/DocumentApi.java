@@ -368,14 +368,6 @@ public interface DocumentApi {
                     )
             )
     })
-    /*
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Документ успешно создан"),
-            @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
-            @ApiResponse(responseCode = "409", description = "Документ с таким innerId уже существует"),
-            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
-    })
-    */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<DocumentDto> create(@Validated(DocumentDto.Create.class) @RequestBody DocumentDto documentDto);
 
@@ -522,13 +514,6 @@ public interface DocumentApi {
                             schema = @Schema(implementation = ErrorResponse.class)
                     ))
     })
-    /*
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Документ найден"),
-            @ApiResponse(responseCode = "404", description = "Документ не найден"),
-            @ApiResponse(responseCode = "400", description = "Неверный формат ID")
-    })
-    */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<DocumentDto> getDocumentById(
             @Parameter(description = "Id документа", example = "1", required = true)
@@ -1037,13 +1022,6 @@ public interface DocumentApi {
                     )
             )
     })
-    /*
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Обработка завершена"),
-        @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
-        @ApiRespon0se(responseCode = "409", description = "Конфликт статусов")
-    })
-    */
     @PutMapping(value = "/submit", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<List<DocumentSubmitResponseDto>> submit(
             @PageableDefault(size = PAGE_SIZE, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
@@ -1152,13 +1130,6 @@ public interface DocumentApi {
                             schema = @Schema(implementation = ErrorResponse.class))
             )
     })
-    /*
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Обработка завершена"),
-            @ApiResponse(responseCode = "400", description = "Ошибка валидации"),
-            @ApiResponse(responseCode = "409", description = "Конфликт при утверждении")
-    })
-    */
     @PutMapping(value = "/approve", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<List<DocumentSubmitResponseDto>> approve(
             @PageableDefault(size = PAGE_SIZE, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
